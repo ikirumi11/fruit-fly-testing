@@ -1,45 +1,62 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Fruit Fly Brain 3D</title>
+<title>GitHub Site Builder</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#05070a;color:#e8edf3;font:14px system-ui,Segoe UI,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:14px;top:14px;width:min(390px,calc(100vw - 28px));padding:16px;border:1px solid #26303b;border-radius:14px;background:rgba(8,11,16,.88);backdrop-filter:blur(12px);box-shadow:0 15px 50px #0008}h1{font-size:18px;margin:0 0 6px}.muted{color:#91a0af;font-size:12px;line-height:1.45}.row{display:flex;gap:8px;align-items:center;margin-top:12px}button{border:1px solid #34414e;background:#121922;color:#e8edf3;border-radius:9px;padding:9px 12px;cursor:pointer}button:hover{background:#19232e}.stat{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.box{padding:9px;border:1px solid #202b36;border-radius:9px;background:#0b1016}.v{font-size:17px;font-weight:700}.k{font-size:11px;color:#81909f}.bar{height:5px;background:#1b2530;border-radius:5px;overflow:hidden;margin-top:10px}.bar i{display:block;height:100%;width:0;background:#76b7ff}.error{color:#ff9b9b;margin-top:8px;white-space:pre-wrap}.hint{position:fixed;right:14px;bottom:14px;padding:8px 11px;border-radius:9px;background:#080b0fcc;color:#82909e;font-size:12px}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07090d;color:#edf2f7;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}#loader{position:fixed;inset:0;display:flex;flex-direction:column;background:#07090d;z-index:5}.top{padding:18px 20px 14px;border-bottom:1px solid #202733;background:#0c1016}.title{font-size:20px;font-weight:750}.sub{margin-top:4px;color:#8d99a8;font-size:13px}.overall{height:7px;background:#1a2029;border-radius:99px;overflow:hidden;margin-top:14px}.overall i{display:block;height:100%;width:0;background:#72b7ff;transition:width .12s}.summary{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;color:#9da8b5;font-size:12px}.summary b{color:#edf2f7}.files{flex:1;overflow:auto;padding:12px 14px 30px}.file{border:1px solid #1f2731;background:#0c1117;border-radius:10px;padding:11px 12px;margin-bottom:8px}.line{display:flex;gap:10px;align-items:center}.name{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.state{font-size:11px;color:#82909e;white-space:nowrap}.bar{height:4px;background:#18202a;border-radius:99px;overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;width:0;background:#65aef5}.meta{display:flex;justify-content:space-between;margin-top:6px;color:#71808f;font-size:11px}.done .state{color:#82d6a4}.error .state{color:#ff9292}.error .bar i{background:#ff7373}.active{border-color:#31506d}.active .state{color:#8bc7ff}#site{position:fixed;inset:0;width:100%;height:100%;border:0;display:none;background:#fff;z-index:2}.showSite #loader{display:none}.showSite #site{display:block}.siteTop{position:fixed;z-index:3;top:10px;right:10px;display:none}.showSite .siteTop{display:block}.siteTop button{border:1px solid #34414e;background:#10161d;color:#fff;border-radius:8px;padding:8px 11px;cursor:pointer;opacity:.88}.siteTop button:hover{opacity:1}.foot{padding:10px 14px;border-top:1px solid #202733;color:#6f7d8b;font-size:11px}.hidden{display:none!important}
 </style>
 </head>
 <body>
-<div id="view"></div>
-<section id="ui">
-<h1>Fruit Fly Brain — 3D</h1>
-<div class="muted">Browser viewer/simulator using the raw brain data in this repository. Drag to orbit, wheel to zoom.</div>
-<div class="row"><button id="start">Start simulation</button><button id="reload">Reload data</button></div>
-<div class="stat"><div class="box"><div class="v" id="neurons">—</div><div class="k">neurons loaded</div></div><div class="box"><div class="v" id="edges">—</div><div class="k">connections loaded</div></div><div class="box"><div class="v" id="active">—</div><div class="k">active sample</div></div><div class="box"><div class="v" id="fps">—</div><div class="k">render FPS</div></div></div>
-<div class="bar"><i id="progress"></i></div><div id="status" class="muted" style="margin-top:7px">Loading renderer…</div><div id="error" class="error"></div>
-</section><div class="hint">Mouse: orbit · Wheel: zoom · Space: pause</div>
-<script src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.180.0/examples/js/controls/OrbitControls.js"></script>
+<div id="loader">
+<div class="top">
+<div class="title">Building GitHub site</div>
+<div class="sub" id="status">Connecting to GitHub…</div>
+<div class="overall"><i id="overallBar"></i></div>
+<div class="summary"><span>Files: <b id="fileCount">0</b></span><span>Done: <b id="doneCount">0</b></span><span>Total: <b id="totalSize">—</b></span><span>Downloaded: <b id="downloaded">0 B</b></span><span>ETA: <b id="eta">—</b></span></div>
+</div>
+<div class="files" id="files"></div>
+<div class="foot" id="foot">Every repository file is downloaded before the site is shown.</div>
+</div>
+<iframe id="site" sandbox="allow-scripts allow-forms allow-modals allow-popups allow-downloads"></iframe>
+<div class="siteTop"><button onclick="location.reload()">Reload loader</button></div>
 <script>
-const state={running:true,neurons:[],edges:[],activity:[],clock:0};
-const $=id=>document.getElementById(id);function status(s){$('status').textContent=s}function fail(s){$('error').textContent=s}
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x05070a);
-const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.01,100);camera.position.set(0,0,6);
-const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);$('view').appendChild(renderer.domElement);
-const controls=new THREE.OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.target.set(0,0,0);
-scene.add(new THREE.AmbientLight(0xffffff,.8));const light=new THREE.PointLight(0x99bbff,4,20);light.position.set(2,3,4);scene.add(light);
-const group=new THREE.Group();scene.add(group);let points=null,lines=null;
-function makeFly(){const g=new THREE.Group();const mat=new THREE.MeshStandardMaterial({color:0x59442f,roughness:.8});const dark=new THREE.MeshStandardMaterial({color:0x15191d,roughness:.5});
-for(const [s,p] of [[[1.25,1,.8],[0,0,0]],[.75,.65,.65],[.45,.45,.55]] ){const m=new THREE.Mesh(new THREE.SphereGeometry(1,20,12),mat);m.scale.set(s,p[0]||s,p[1]||s);m.position.set((g.children.length-1)*1.0,0,0);g.add(m)}
-const eyeMat=new THREE.MeshStandardMaterial({color:0x181818});for(const x of [-.34,.34]){const e=new THREE.Mesh(new THREE.SphereGeometry(.23,16,10),eyeMat);e.position.set(-1.05,x,.34);g.add(e)}
-const wingMat=new THREE.MeshBasicMaterial({color:0x9aa6b2,transparent:true,opacity:.16,side:THREE.DoubleSide});for(const y of [-1,1]){const w=new THREE.Mesh(new THREE.PlaneGeometry(2.5,1),wingMat);w.rotation.set(.1,y>0?.18:-.18,y*.25);w.position.set(.25,y*.65,.1);g.add(w)}g.scale.setScalar(.7);return g}
-const fly=makeFly();fly.position.set(0,-1.5,0);group.add(fly);
-function buildData(neurons,edges){state.neurons=neurons||[];state.edges=edges||[];if(points)group.remove(points);if(lines)group.remove(lines);const max=Math.min(state.neurons.length,12000);const pos=new Float32Array(max*3);for(let i=0;i<max;i++){const n=state.neurons[i];pos[i*3]=Number(n[0]??n.x??0);pos[i*3+1]=Number(n[1]??n.y??0);pos[i*3+2]=Number(n[2]??n.z??0)}const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(pos,3));points=new THREE.Points(geo,new THREE.PointsMaterial({size:.018,color:0x70b7ff,transparent:true,opacity:.72}));group.add(points);
-const ec=Math.min(state.edges.length,9000),arr=new Float32Array(ec*6);for(let i=0;i<ec;i++){const e=state.edges[i];const a=state.neurons[e[0]],b=state.neurons[e[1]];if(!a||!b)continue;arr.set([a[0],a[1],a[2],b[0],b[1],b[2]],i*6)}const lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.BufferAttribute(arr,3));lines=new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0x37688e,transparent:true,opacity:.13}));group.add(lines);$('neurons').textContent=state.neurons.length.toLocaleString();$('edges').textContent=state.edges.length.toLocaleString();status('Brain data loaded.');}
-function normalize(raw){if(raw&&raw.neurons)return raw;if(raw&&raw.nodes)return {neurons:raw.nodes,edges:raw.edges||raw.connections||[]};return null}
-async function load(){fail('');$('progress').style.width='5%';status('Reading brain_raw.txt…');try{const r=await fetch('brain_raw.txt',{cache:'no-store'});if(!r.ok)throw Error('Could not read brain_raw.txt ('+r.status+').');const text=await r.text();$('progress').style.width='30%';let data=null;try{data=normalize(JSON.parse(text))}catch{}
-if(!data){const m=text.match(/\{[\s\S]*\}/);if(m)try{data=normalize(JSON.parse(m[0]))}catch{}}
-if(!data){status('Raw file found, but its exact serialization is not browser-readable JSON.');$('progress').style.width='100%';fail('The repository currently contains the 23 MB raw file, but it is not possible to safely guess its NPZ serialization from the browser. Run prepare_brain.py once to convert the original NPZ/raw representation into brain.json, then reload.');return}
-$('progress').style.width='70%';buildData(data.neurons||[],data.edges||[]);$('progress').style.width='100%'}catch(e){fail(e.message);status('Load failed.')}}
-$('start').onclick=()=>{state.running=!state.running;$('start').textContent=state.running?'Pause simulation':'Start simulation'};$('reload').onclick=load;addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();$('start').click()}});addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
-let last=performance.now(),frames=0;function loop(t){requestAnimationFrame(loop);const dt=(t-last)/1000;last=t;if(state.running){state.clock+=dt;if(points){const a=points.geometry.attributes.position.array;const count=a.length/3;for(let i=0;i<Math.min(count,2500);i++){const j=i*3;a[j+1]+=Math.sin(state.clock*2+i*.013)*.00012}}}group.rotation.y+=dt*.035;controls.update();renderer.render(scene,camera);frames++;if(frames%20===0){$('fps').textContent=Math.round(1/dt);$('active').textContent=state.neurons.length?Math.floor((Math.sin(state.clock*2)+1)*.5*state.neurons.length).toLocaleString():'—'}}requestAnimationFrame(loop);load();
-</script></body></html>
+const OWNER="ikirumi11";
+const REPO="fruit-fly-testing";
+const BRANCH="main";
+const ROOT="";
+const API=`https://api.github.com/repos/${OWNER}/${REPO}/git/trees/${encodeURIComponent(BRANCH)}?recursive=1`;
+const RAW=`https://raw.githubusercontent.com/${OWNER}/${REPO}/${encodeURIComponent(BRANCH)}/`;
+const $=id=>document.getElementById(id);
+const filesBox=$("files");
+const fileRows=new Map();
+const fileData=new Map();
+const blobUrls=new Map();
+let totalBytes=0,downloadedBytes=0,done=0,startTime=0;
+function fmtBytes(n){if(!Number.isFinite(n)||n<0)return "—";const u=["B","KB","MB","GB"];let i=0;while(n>=1024&&i<u.length-1){n/=1024;i++}return (n<10&&i? n.toFixed(1):Math.round(n))+" "+u[i]}
+function fmtTime(sec){if(!Number.isFinite(sec)||sec<0)return "—";sec=Math.ceil(sec);if(sec<60)return sec+"s";const m=Math.floor(sec/60),s=sec%60;if(m<60)return m+"m "+s+"s";return Math.floor(m/60)+"h "+(m%60)+"m"}
+function esc(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
+function addRow(path,size){const el=document.createElement("div");el.className="file";el.innerHTML=`<div class="line"><div class="name" title="${esc(path)}">${esc(path)}</div><div class="state">Waiting</div></div><div class="bar"><i></i></div><div class="meta"><span>0%</span><span>${fmtBytes(size)}</span><span>ETA —</span></div>`;filesBox.appendChild(el);fileRows.set(path,{el,state:el.querySelector(".state"),bar:el.querySelector("i"),pct:el.querySelector(".meta span:nth-child(1)"),size:el.querySelector(".meta span:nth-child(2)"),eta:el.querySelector(".meta span:nth-child(3)")})}
+function setRow(path,pct,state,eta){const r=fileRows.get(path);if(!r)return;r.el.classList.toggle("active",state==="Downloading");r.el.classList.toggle("done",state==="Done");r.el.classList.toggle("error",state==="Error");r.state.textContent=state;r.bar.style.width=Math.max(0,Math.min(100,pct))+"%";r.pct.textContent=Math.round(pct)+"%";r.eta.textContent="ETA "+(eta||"—")}
+function setOverall(){const elapsed=(performance.now()-startTime)/1000;const speed=elapsed>0?downloadedBytes/elapsed:0;const remaining=Math.max(0,totalBytes-downloadedBytes);$("downloaded").textContent=fmtBytes(downloadedBytes);$("overallBar").style.width=(totalBytes?Math.min(100,downloadedBytes/totalBytes*100):done/(Math.max(1,fileRows.size))*100)+"%";$("doneCount").textContent=done;$("eta").textContent=speed>0?fmtTime(remaining/speed):"—"}
+async function getTree(){const r=await fetch(API,{headers:{Accept:"application/vnd.github+json"},cache:"no-store"});if(!r.ok)throw Error("GitHub API error: "+r.status+" "+r.statusText);const j=await r.json();if(j.truncated)throw Error("GitHub returned a truncated file list. This repository is too large for one recursive tree request.");return (j.tree||[]).filter(x=>x.type==="blob")}
+function findIndex(paths){const clean=x=>x.replace(/^\.\//,"").replace(/^\//,"").toLowerCase();const list=paths.map(x=>x.path);if(ROOT){const exact=clean(ROOT+"/index.html");const hit=list.find(x=>clean(x)===exact);if(hit)return hit}return list.find(x=>clean(x)==="index.html")||list.find(x=>clean(x).endsWith("/index.html"))||null}
+function relative(base,value){const b=base.split("/");b.pop();const v=value.split("/");for(const p of v){if(!p||p===".")continue;if(p==="..")b.pop();else b.push(p)}return b.join("/")}
+function localPath(value,current){if(!value)return null;value=value.trim();if(/^(https?:|data:|blob:|javascript:|mailto:|tel:|#|\/\/)/i.test(value))return null;if(value.startsWith("/"))return value.slice(1);return relative(current,value)}
+function makeObjectUrl(path,bytes,mime){const old=blobUrls.get(path);if(old)URL.revokeObjectURL(old);const u=URL.createObjectURL(new Blob([bytes],{type:mime||"application/octet-stream"}));blobUrls.set(path,u);return u}
+function mime(path){const e=path.split(".").pop().toLowerCase();return ({html:"text/html",htm:"text/html",css:"text/css",js:"text/javascript",mjs:"text/javascript",json:"application/json",svg:"image/svg+xml",txt:"text/plain",xml:"application/xml",png:"image/png",jpg:"image/jpeg",jpeg:"image/jpeg",gif:"image/gif",webp:"image/webp",avif:"image/avif",ico:"image/x-icon",mp3:"audio/mpeg",wav:"audio/wav",ogg:"audio/ogg",mp4:"video/mp4",webm:"video/webm",wasm:"application/wasm",glb:"model/gltf-binary",gltf:"model/gltf+json"})[e]||"application/octet-stream"}
+async function downloadFile(item,index,total){const path=item.path;setRow(path,0,"Downloading",null);const t0=performance.now();try{const r=await fetch(RAW+path.split("/").map(encodeURIComponent).join("/"),{cache:"no-store"});if(!r.ok)throw Error(r.status+" "+r.statusText);const expected=Number(r.headers.get("content-length"))||item.size||0;const reader=r.body?r.body.getReader():null;let chunks=[],got=0;if(reader){while(true){const x=await reader.read();if(x.done)break;chunks.push(x.value);got+=x.value.byteLength;downloadedBytes+=x.value.byteLength;const pct=expected?got/expected*100:0;const elapsed=(performance.now()-t0)/1000;const speed=elapsed>0?got/elapsed:0;setRow(path,pct,"Downloading",speed&&expected?fmtTime(Math.max(0,expected-got)/speed):null);setOverall()}}else{const b=new Uint8Array(await r.arrayBuffer());chunks=[b];got=b.byteLength;downloadedBytes+=got;setOverall()}let bytes=new Uint8Array(got),at=0;for(const c of chunks){bytes.set(c,at);at+=c.byteLength}const type=mime(path);fileData.set(path,{bytes,type,text:(type.startsWith("text/")||type.includes("javascript")||type.includes("json")||type.includes("xml")||type.includes("svg"))?new TextDecoder().decode(bytes):null});makeObjectUrl(path,bytes,type);done++;setRow(path,100,"Done",null);setOverall()}catch(e){setRow(path,0,"Error",null);throw Error(path+": "+e.message)}}
+function rewriteCss(css,current){return css.replace(/url\(\s*(["']?)([^"')]+)\1\s*\)/gi,(m,q,u)=>{const p=localPath(u,current);return p&&blobUrls.has(p)?`url("${blobUrls.get(p)}")`:m})}
+function rewriteHtml(html,current){const parser=new DOMParser();const doc=parser.parseFromString(html,"text/html");doc.querySelectorAll("base").forEach(x=>x.remove());for(const el of doc.querySelectorAll("script[src],link[href],img[src],source[src],video[src],audio[src],iframe[src],object[data],input[src],image[href]")){for(const attr of ["src","href","data"]){if(!el.hasAttribute(attr))continue;const v=el.getAttribute(attr),p=localPath(v,current);if(p&&blobUrls.has(p))el.setAttribute(attr,blobUrls.get(p));}}
+for(const el of doc.querySelectorAll("style"))el.textContent=rewriteCss(el.textContent,current);for(const el of doc.querySelectorAll("[style]"))el.setAttribute("style",rewriteCss(el.getAttribute("style"),current));
+for(const el of doc.querySelectorAll("link[rel~='stylesheet']")){const v=el.getAttribute("href"),p=localPath(v,current);if(p&&fileData.get(p)?.text){const style=doc.createElement("style");style.textContent=rewriteCss(fileData.get(p).text,p);el.replaceWith(style)}}
+for(const el of doc.querySelectorAll("script[src]")){const v=el.getAttribute("src");const p=[...blobUrls].find(([k,u])=>u===v)?.[0];if(p&&fileData.get(p)?.text){el.removeAttribute("src");el.textContent=fileData.get(p).text}}
+const marker=doc.createElement("script");marker.textContent=`window.GITHUB_SITE_LOADER=true;window.GITHUB_REPOSITORY=${JSON.stringify(OWNER+"/"+REPO)};window.GITHUB_FILE_COUNT=${fileData.size};`;doc.body?doc.body.appendChild(marker):doc.documentElement.appendChild(marker);return "<!doctype html>"+doc.documentElement.outerHTML}
+async function build(){try{startTime=performance.now();$("status").textContent="Reading repository file list…";const tree=await getTree();$("fileCount").textContent=tree.length;tree.forEach(x=>{totalBytes+=x.size||0;addRow(x.path,x.size||0)});$("totalSize").textContent=fmtBytes(totalBytes);setOverall();$("status").textContent=`Downloading ${tree.length} files…`;
+for(let i=0;i<tree.length;i++){await downloadFile(tree[i],i,tree.length);$("status").textContent=`Downloaded ${done}/${tree.length} files…`}
+const index=findIndex(tree);if(!index)throw Error("No index.html was found in the repository.");$("status").textContent="All files downloaded. Building site…";const source=fileData.get(index)?.text;if(source==null)throw Error("index.html could not be decoded as text.");const output=rewriteHtml(source,index);$("status").textContent="Site ready.";$("foot").textContent=`Built from ${fileData.size} GitHub files. Showing ${index}.`;setTimeout(()=>{$("site").srcdoc=output;document.body.classList.add("showSite")},150)}catch(e){$("status").textContent="Build failed";$("foot").textContent=e.message;console.error(e)}}
+build();
+</script>
+</body>
+</html>
