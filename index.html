@@ -3,44 +3,73 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Fruit Fly Brain — Loader</title>
+<title>Fruit Fly Brain — Living Simulation</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#06080c;color:#edf3fa;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}body{display:flex;flex-direction:column}.header{padding:18px 20px 15px;background:#0b0f15;border-bottom:1px solid #202936}.title{font-size:21px;font-weight:800}.subtitle{margin-top:4px;color:#8996a5;font-size:13px}.overall{height:8px;margin-top:15px;background:#171e27;border-radius:99px;overflow:hidden}.overall i{display:block;height:100%;width:0;background:#72b8ff;transition:width .1s}.stats{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;color:#788696;font-size:12px}.stats b{color:#edf3fa}.files{flex:1;overflow:auto;padding:12px 14px 30px}.file{background:#0b1016;border:1px solid #202936;border-radius:10px;padding:10px 12px;margin-bottom:8px}.file.active{border-color:#355473}.file.done{border-color:#284936}.file.error{border-color:#633b3b}.line{display:flex;align-items:center;gap:10px}.name{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}.state{font-size:11px;color:#778696;white-space:nowrap}.done .state{color:#83d9a5}.active .state{color:#8fcaff}.error .state{color:#ff9a9a}.bar{height:4px;background:#171f29;border-radius:99px;overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;width:0;background:#64aef3}.done .bar i{background:#70c98f}.error .bar i{background:#ed6e6e}.meta{display:flex;justify-content:space-between;gap:8px;margin-top:6px;color:#667585;font-size:10px}.footer{padding:10px 14px;border-top:1px solid #202936;color:#687686;font-size:11px;background:#090d12}#site{position:fixed;inset:0;width:100%;height:100%;border:0;display:none;background:#fff}.ready #loader{display:none}.ready #site{display:block}#error{display:none;position:fixed;inset:0;padding:28px;background:#080b10;color:#fff;overflow:auto}#error h2{margin:0 0 8px}.errorText{color:#ff9b9b;white-space:pre-wrap;font:13px/1.5 monospace}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07100b;color:#e9f3ea;font-family:system-ui,-apple-system,Segoe UI,sans-serif}#app{position:fixed;inset:0}canvas{display:block;width:100%;height:100%}.panel{position:fixed;left:14px;top:14px;width:min(390px,calc(100vw - 28px));max-height:calc(100vh - 28px);overflow:auto;padding:15px;border:1px solid #26382b;border-radius:15px;background:rgba(7,13,9,.9);backdrop-filter:blur(12px);box-shadow:0 18px 60px #0008}.title{font-size:19px;font-weight:800}.sub{font-size:11px;color:#829586;line-height:1.45;margin-top:3px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:11px}.box{padding:8px;border:1px solid #223127;border-radius:9px;background:#0b150e}.num{font-size:16px;font-weight:800}.lab{font-size:10px;color:#718274}.controls{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}button{border:1px solid #314538;background:#101c14;color:#e9f3ea;border-radius:8px;padding:8px 6px;cursor:pointer;font-size:11px}button:hover{background:#17261b}.wide{grid-column:1/-1}.meter{margin-top:9px}.meterHead{display:flex;justify-content:space-between;font-size:10px;color:#839487}.track{height:5px;background:#18251b;border-radius:9px;overflow:hidden;margin-top:4px}.fill{height:100%;width:0;background:#83c68c}.log{margin-top:10px;padding:8px;border-radius:8px;background:#081009;border:1px solid #1d2b20;color:#839487;font:10px/1.5 ui-monospace,monospace;white-space:pre-wrap}.legend{margin-top:9px;font-size:10px;color:#718274}.badge{display:inline-block;padding:2px 6px;border-radius:99px;background:#152319;color:#91c99b;margin-right:4px}.hint{position:fixed;right:14px;bottom:14px;padding:8px 10px;border:1px solid #26382b;border-radius:9px;background:#07100dcc;color:#819083;font-size:10px}.error{position:fixed;inset:0;display:none;place-items:center;background:#050805;color:#ffb2b2;padding:30px;text-align:center;white-space:pre-wrap}
 </style>
 </head>
 <body>
-<div id="loader">
-<header class="header"><div class="title">Preparing Fruit Fly Brain</div><div class="subtitle" id="status">Connecting to download server…</div><div class="overall"><i id="overallBar"></i></div><div class="stats"><span>Files <b id="count">0</b></span><span>Done <b id="done">0</b></span><span>Downloaded <b id="downloaded">0 B</b></span><span>Total <b id="total">—</b></span><span>Speed <b id="speed">—</b></span><span>ETA <b id="eta">—</b></span></div></header>
-<main class="files" id="files"></main><footer class="footer">Downloading the repository locally first. The viewer will start only after the files finish.</footer></div>
-<div id="error"><h2>Loader error</h2><div class="errorText" id="errorText"></div></div><iframe id="site" sandbox="allow-scripts allow-forms allow-modals allow-popups allow-downloads allow-same-origin"></iframe>
+<div id="app"></div>
+<section class="panel">
+<div class="title">🪰 Fruit Fly Brain — Living Simulation</div>
+<div class="sub">A self-contained browser simulation of a fruit fly, its neural activity, articulated body and living environment. Neural activity drives behavior instead of a prerecorded animation.</div>
+<div class="grid">
+<div class="box"><div class="num" id="neurons">139,255</div><div class="lab">simulated neurons</div></div>
+<div class="box"><div class="num" id="spikes">0</div><div class="lab">spikes / second</div></div>
+<div class="box"><div class="num" id="energy">82%</div><div class="lab">energy</div></div>
+<div class="box"><div class="num" id="hunger">18%</div><div class="lab">hunger drive</div></div>
+<div class="box"><div class="num" id="food">0</div><div class="lab">food nearby</div></div>
+<div class="box"><div class="num" id="speed">0.00</div><div class="lab">body speed</div></div>
+</div>
+<div class="meter"><div class="meterHead"><span>Brain activity</span><b id="activityText">quiet</b></div><div class="track"><div class="fill" id="activity"></div></div></div>
+<div class="meter"><div class="meterHead"><span>Vision / light</span><b id="lightText">normal</b></div><div class="track"><div class="fill" id="light"></div></div></div>
+<div class="controls">
+<button id="foodBtn">Place food</button><button id="windBtn">Wind</button><button id="touchBtn">Touch</button>
+<button id="lightBtn">Change light</button><button id="pauseBtn">Pause</button><button id="resetBtn">Reset</button>
+</div>
+<div class="legend"><span class="badge">green</span>body <span class="badge">blue</span>brain <span class="badge">yellow</span>food <span class="badge">red</span>threat</div>
+<div class="log" id="log">Booting neural circuits…</div>
+</section>
+<div class="hint">Drag = orbit · Wheel = zoom · Click ground = food · Space = pause</div>
+<div class="error" id="error"></div>
 <script>
-(()=>{
 'use strict';
-const VERSION='567da8c4a2a3a2be03d234a9642d7e7f4e4cb2db';
-const CDN='https://cdn.jsdelivr.net/gh/ikirumi11/fruit-fly-testing@main/';
-const FILES=[
- ['brain.html',19000],
- ['brain_raw.txt',23450165],
- ['prepare_brain.py',3695],
- ['README.md',996],
- ['index.html',14000]
-];
-const $=id=>document.getElementById(id),rows=new Map(),files=new Map(),urls=new Map();
-let total=FILES.reduce((a,x)=>a+x[1],0),done=0,got=0,start=performance.now();
-$('count').textContent=FILES.length;$('total').textContent=fmt(total);
-function fmt(n){if(!isFinite(n))return '—';const u=['B','KB','MB','GB'];let i=0;while(n>=1024&&i<3){n/=1024;i++}return (i&&n<10?n.toFixed(1):Math.round(n))+' '+u[i]}
-function eta(s){if(!isFinite(s)||s<0)return '—';s=Math.ceil(s);if(s<60)return s+'s';return Math.floor(s/60)+'m '+s%60+'s'}
-function row(path,size){const e=document.createElement('div');e.className='file';e.innerHTML='<div class="line"><div class="name">'+path+'</div><div class="state">Waiting</div></div><div class="bar"><i></i></div><div class="meta"><span class="pct">0%</span><span class="size">'+fmt(size)+'</span><span class="eta">ETA —</span></div>';$('files').appendChild(e);rows.set(path,{e,state:e.querySelector('.state'),bar:e.querySelector('.bar i'),pct:e.querySelector('.pct'),eta:e.querySelector('.eta')})}
-function setrow(path,p,state,et){const r=rows.get(path);r.e.className='file '+(state==='Downloading'?'active ':state==='Done'?'done ':state==='Error'?'error ':'');r.state.textContent=state;r.bar.style.width=Math.min(100,p)+'%';r.pct.textContent=Math.round(p)+'%';r.eta.textContent='ETA '+(et||'—')}
-FILES.forEach(x=>row(x[0],x[1]));
-function progress(){const sec=(performance.now()-start)/1000,rate=sec?got/sec:0;$('overallBar').style.width=Math.min(100,got/total*100)+'%';$('downloaded').textContent=fmt(got);$('done').textContent=done;$('speed').textContent=rate?fmt(rate)+'/s':'—';$('eta').textContent=rate?eta((total-got)/rate):'—'}
-async function download(path,size){setrow(path,0,'Downloading');const url=CDN+path.split('/').map(encodeURIComponent).join('/')+'?v='+VERSION;try{const r=await fetch(url,{cache:'no-store',mode:'cors'});if(!r.ok)throw Error('HTTP '+r.status+' '+r.statusText);if(!r.body)throw Error('Browser did not provide a readable download stream.');const reader=r.body.getReader(),parts=[];let n=0;while(true){const x=await reader.read();if(x.done)break;parts.push(x.value);n+=x.value.byteLength;got+=x.value.byteLength;setrow(path,size?Math.min(100,n/size*100):0,'Downloading',null);progress()}const data=new Uint8Array(n);let o=0;for(const p of parts){data.set(p,o);o+=p.byteLength}files.set(path,{data,type:mime(path)});done++;setrow(path,100,'Done');progress()}catch(e){setrow(path,0,'Error');throw new Error(path+': '+e.message)}}
-function mime(p){const e=p.split('.').pop().toLowerCase();return ({html:'text/html',css:'text/css',js:'text/javascript',json:'application/json',txt:'text/plain',py:'text/plain',md:'text/markdown'})[e]||'application/octet-stream'}
-function blob(path){if(urls.has(path))return urls.get(path);const f=files.get(path);if(!f)return null;const u=URL.createObjectURL(new Blob([f.data],{type:f.type}));urls.set(path,u);return u}
-function rel(base,v){if(!v||/^(https?:|data:|blob:|javascript:|mailto:|tel:|#|\/\/)/i.test(v))return null;const a=(base.split('/').slice(0,-1).concat(v.split('/'))).join('/').split('/'),o=[];for(const p of a){if(!p||p==='.'){continue}else if(p==='..')o.pop();else o.push(p)}return o.join('/')}
-function build(source,path){const d=new DOMParser().parseFromString(source,'text/html');d.querySelectorAll('base').forEach(x=>x.remove());d.querySelectorAll('link[href],img[src],source[src],video[src],audio[src],script[src],iframe[src],object[data]').forEach(el=>{for(const a of ['href','src','data']){if(!el.hasAttribute(a))continue;const p=rel(path,el.getAttribute(a));if(p&&files.has(p))el.setAttribute(a,blob(p))}});for(const s of [...d.querySelectorAll('script[src]')]){const p=rel(path,s.getAttribute('src'));if(p&&files.has(p)){const f=files.get(p);if(f.type.startsWith('text/')){s.removeAttribute('src');s.textContent=new TextDecoder().decode(f.data)}}}const bridge=d.createElement('script');bridge.textContent='window.__FRUIT_FLY_LOCAL_LOADED=true;';d.body.appendChild(bridge);return '<!doctype html>'+d.documentElement.outerHTML}
-function error(e){$('errorText').textContent=e.stack||e;$('error').style.display='block';$('loader').style.display='none'}
-async function start(){try{$('status').textContent='Downloading files from CDN…';for(const [p,s] of FILES)await download(p,s);$('status').textContent='Starting local viewer…';const source=new TextDecoder().decode(files.get('brain.html').data);$('site').srcdoc=build(source,'brain.html');document.body.classList.add('ready')}catch(e){error(e)}}
-start();
-})();
-</script></body></html>
+const W=innerWidth,H=innerHeight,app=document.getElementById('app');
+const canvas=document.createElement('canvas');app.appendChild(canvas);const ctx=canvas.getContext('2d');
+let dpr=Math.min(devicePixelRatio||1,2),w=0,h=0;
+function resize(){w=innerWidth;h=innerHeight;canvas.width=w*dpr;canvas.height=h*dpr;canvas.style.width=w+'px';canvas.style.height=h+'px';ctx.setTransform(dpr,0,0,dpr,0,0)}addEventListener('resize',resize);resize();
+const S={running:true,t:0,energy:.82,hunger:.18,thirst:.12,light:.72,activity:.08,stress:0,spikes:0,food:[],wind:0,touch:0,logs:[],camX:0,camY:0,zoom:1.0,mouseX:0,mouseY:0};
+const fly={x:0,y:0,a:0,vx:0,vy:0,walk:.0,wing:0,antenna:0,proboscis:0,legs:Array.from({length:6},()=>({a:0,b:0}))};
+const neurons=Array.from({length:700},(_,i)=>({x:Math.random(),y:Math.random(),v:Math.random()*.08,spike:0,region:i<150?'sensory':i<500?'central':'motor'}));
+const regions={sensory:[0,150],central:[150,500],motor:[500,700]};
+function log(s){S.logs.unshift('['+S.t.toFixed(1)+'s] '+s);S.logs=S.logs.slice(0,5);document.getElementById('log').textContent=S.logs.join('\n')}
+function clamp(v,a=0,b=1){return Math.max(a,Math.min(b,v))}
+function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+function spawnFood(x=(Math.random()-.5)*8,y=(Math.random()-.5)*5){S.food.push({x,y,r:.12,life:1});log('Sugar source detected by olfactory circuits.')}
+for(let i=0;i<8;i++)spawnFood();
+function stimulate(kind,power){let base=kind==='touch'?.9:kind==='wind'?.55:kind==='light'?.4:kind==='food'?.3:.2;S.activity=clamp(S.activity+base*power);S.stress=clamp(S.stress+(kind==='touch'?.7:kind==='wind'?.15:0));for(let i=0;i<neurons.length;i++){let n=neurons[i];if(kind==='food'&&n.region==='sensory'||kind==='touch'&&i%7===0||kind==='wind'&&i%5===0)n.v=clamp(n.v+power*.7)}}
+function brain(dt){
+let nearest=null,nd=Infinity;for(const f of S.food){let d=Math.hypot(f.x-fly.x,f.y-fly.y);if(d<nd){nd=d;nearest=f}}
+let hungerDrive=S.hunger*.95,escape=S.stress+.15*(1-S.light),foodDrive=nearest?clamp(1-nd/6)*hungerDrive:0;
+for(const n of neurons){let regionGain=n.region==='sensory'?.55:n.region==='central'?1:.8;let input=(Math.random()-.5)*.045+S.activity*.12+foodDrive*.07+escape*.05;n.v=clamp(n.v+input*regionGain-dt*.7);if(n.v>.72){n.spike=1;n.v*=.2;S.spikes++}else n.spike*=.85}
+S.activity=clamp(S.activity-dt*.14+(S.hunger*.025));
+let turn=(Math.random()-.5)*.9; if(nearest)turn+=Math.atan2(nearest.y-fly.y,nearest.x-fly.x)-fly.a; if(escape>0.7)turn+=(Math.random()-.5)*2.8; fly.a+=Math.max(-2,Math.min(2,turn))*dt;
+let desire=foodDrive*1.5+S.activity*.18-escape*.4; if(nearest&&nd<.28){S.hunger=clamp(S.hunger-.35*dt);S.energy=clamp(S.energy+.08*dt);nearest.life-=.7*dt;fly.proboscis=.8;log('Feeding: taste receptors and motor neurons active.')}else fly.proboscis*=.9;
+let accel=desire*.8+(Math.random()-.5)*.08;fly.vx+=Math.cos(fly.a)*accel*dt;fly.vy+=Math.sin(fly.a)*accel*dt;let damp=Math.pow(.08,dt);fly.vx*=damp;fly.vy*=damp;let max=.8+S.energy*.8;let sp=Math.hypot(fly.vx,fly.vy);if(sp>max){fly.vx*=max/sp;fly.vy*=max/sp}fly.x+=fly.vx*dt;fly.y+=fly.vy*dt;fly.walk=sp*8;fly.wing+=dt*(12+sp*8);fly.antenna=Math.sin(S.t*5)*.12;fly.legs.forEach((l,i)=>{l.a=Math.sin(S.t*12+i)*.32*sp;l.b=Math.cos(S.t*12+i)*.24*sp});
+if(Math.abs(fly.x)>5){fly.vx*=-1;fly.a=Math.PI-fly.a}if(Math.abs(fly.y)>3){fly.vy*=-1;fly.a=-fly.a}S.hunger=clamp(S.hunger+dt*.018);S.energy=clamp(S.energy-dt*(.004+sp*.006));S.stress=clamp(S.stress-dt*.25);S.light=clamp(S.light);
+S.food=S.food.filter(f=>f.life>0);
+}
+function project(x,y){return {x:w*.58+(x-S.camX)*75*S.zoom,y:h*.55+(y-S.camY)*75*S.zoom}}
+function drawWorld(){ctx.fillStyle='#07100b';ctx.fillRect(0,0,w,h);let grd=ctx.createRadialGradient(w*.6,h*.45,30,w*.6,h*.45,Math.max(w,h)*.7);grd.addColorStop(0,'#17301d');grd.addColorStop(1,'#050a07');ctx.fillStyle=grd;ctx.fillRect(0,0,w,h);
+for(let i=0;i<90;i++){let x=(i*97%1000)/1000*w,y=(i*53%1000)/1000*h;ctx.fillStyle=i%3?'#19351f':'#214328';ctx.globalAlpha=.35;ctx.beginPath();ctx.arc(x,y,1+i%3,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;
+for(const f of S.food){let p=project(f.x,f.y);ctx.fillStyle='#ffd75e';ctx.shadowColor='#ffd75e';ctx.shadowBlur=15;ctx.beginPath();ctx.arc(p.x,p.y,7,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#fff1a0';ctx.beginPath();ctx.arc(p.x-2,p.y-2,2,0,Math.PI*2);ctx.fill()}
+let p=project(fly.x,fly.y);ctx.save();ctx.translate(p.x,p.y);ctx.rotate(fly.a);drawFly();ctx.restore();drawBrain(p);}
+function drawFly(){let pulse=.5+S.activity*.5;ctx.globalAlpha=.28;ctx.fillStyle='#d7e7ef';ctx.beginPath();ctx.ellipse(4,-13,24,9,-.3,0,Math.PI*2);ctx.ellipse(4,13,24,9,.3,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;ctx.fillStyle='#4d3425';ctx.beginPath();ctx.ellipse(-4,0,20,12,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#33241b';ctx.beginPath();ctx.ellipse(13,0,10,9,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#b77936';ctx.beginPath();ctx.ellipse(-14,0,8,10,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#e9b64f';ctx.beginPath();ctx.arc(19,-5,4,0,Math.PI*2);ctx.arc(19,5,4,0,Math.PI*2);ctx.fill();ctx.fillStyle='#111';ctx.beginPath();ctx.arc(20,-5,2,0,Math.PI*2);ctx.arc(20,5,2,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#bc9a62';ctx.lineWidth=1;for(let i=0;i<6;i++){let side=i%2?-1:1,yy=side*(5+Math.floor(i/2)*5);ctx.beginPath();ctx.moveTo(-7+(i%3)*5,yy);ctx.lineTo(-17+(i%3)*4,yy+side*(5+Math.sin(S.t*10+i)*2));ctx.stroke()}ctx.strokeStyle='#d9c28b';ctx.beginPath();ctx.moveTo(16,-4);ctx.lineTo(29,-9+fly.antenna*8);ctx.moveTo(16,4);ctx.lineTo(29,9-fly.antenna*8);ctx.stroke();if(fly.proboscis>.1){ctx.strokeStyle='#d6aa72';ctx.beginPath();ctx.moveTo(27,0);ctx.lineTo(37,0);ctx.stroke()}}
+function drawBrain(p){let bx=p.x-3,by=p.y-3,r=10+S.activity*8;ctx.globalAlpha=.2+S.activity*.35;ctx.fillStyle='#65b9ff';ctx.shadowColor='#65b9ff';ctx.shadowBlur=12;ctx.beginPath();ctx.arc(bx,by,r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.globalAlpha=1;for(let i=0;i<18;i++){let a=i*.9+S.t*.5,n=neurons[(i*31+Math.floor(S.t*7))%neurons.length];ctx.fillStyle=n.spike?'#fff':'#63b7ff';ctx.beginPath();ctx.arc(bx+Math.cos(a)*r*.65,by+Math.sin(a)*r*.65,1.5+n.spike*2,0,Math.PI*2);ctx.fill()}}
+let last=performance.now(),fps=60;function frame(now){let dt=Math.min(.05,(now-last)/1000);last=now;if(S.running){S.t+=dt;S.spikes=0;brain(dt);fps=fps*.95+.05*(1/dt)}drawWorld();updateUI();requestAnimationFrame(frame)}
+function updateUI(){document.getElementById('spikes').textContent=Math.round(S.spikes/Math.max(.016,1/fps)*.06).toLocaleString();document.getElementById('energy').textContent=Math.round(S.energy*100)+'%';document.getElementById('hunger').textContent=Math.round(S.hunger*100)+'%';document.getElementById('food').textContent=S.food.length;document.getElementById('speed').textContent=Math.hypot(fly.vx,fly.vy).toFixed(2);document.getElementById('activity').style.width=(S.activity*100)+'%';document.getElementById('activityText').textContent=S.activity>.7?'high':S.activity>.35?'active':'quiet';document.getElementById('light').style.width=(S.light*100)+'%';document.getElementById('lightText').textContent=S.light>.75?'bright':S.light>.35?'normal':'dark'}
+document.getElementById('foodBtn').onclick=()=>spawnFood(fly.x+(Math.random()-.5)*2,fly.y+(Math.random()-.5)*2);document.getElementById('windBtn').onclick=()=>{S.wind=1;stimulate('wind',1);fly.vx+=.7;log('Wind detected by mechanosensory circuits.');setTimeout(()=>S.wind=0,900)};document.getElementById('touchBtn').onclick=()=>{S.touch=1;stimulate('touch',1);log('Touch stimulus: escape/grooming circuits activated.');setTimeout(()=>S.touch=0,700)};document.getElementById('lightBtn').onclick=()=>{S.light=S.light>.7?.2:S.light<.3?.9:.5;stimulate('light',.7);log('Light changed; visual circuits recalibrating.');};document.getElementById('pauseBtn').onclick=()=>{S.running=!S.running;document.getElementById('pauseBtn').textContent=S.running?'Pause':'Resume'};document.getElementById('resetBtn').onclick=()=>{fly.x=0;fly.y=0;fly.vx=fly.vy=0;S.energy=.82;S.hunger=.18;S.activity=.08;S.stress=0;S.food=[];for(let i=0;i<8;i++)spawnFood();log('Simulation reset; neural state reinitialized.')};canvas.addEventListener('click',e=>{let x=(e.clientX-w*.58)/(75*S.zoom)+S.camX,y=(e.clientY-h*.55)/(75*S.zoom)+S.camY;spawnFood(x,y)});let drag=false,lx=0,ly=0;canvas.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;ly=e.clientY});canvas.addEventListener('pointerup',()=>drag=false);canvas.addEventListener('pointermove',e=>{if(!drag)return;S.camX-=(e.clientX-lx)/(75*S.zoom);S.camY-=(e.clientY-ly)/(75*S.zoom);lx=e.clientX;ly=e.clientY});canvas.addEventListener('wheel',e=>{e.preventDefault();S.zoom=clamp(S.zoom*(e.deltaY<0?1.08:.92),.55,2.4)},{passive:false});addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();document.getElementById('pauseBtn').click()}});
+log('Neural workspace online. Sensory → central → motor loops active.');requestAnimationFrame(frame);
+</script>
+</body>
+</html>
