@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fruit Fly Brain 3D</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#05070a;color:#e8edf3;font:14px system-ui,Segoe UI,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:14px;top:14px;width:min(390px,calc(100vw - 28px));padding:16px;border:1px solid #26303b;border-radius:14px;background:rgba(8,11,16,.88);backdrop-filter:blur(12px);box-shadow:0 15px 50px #0008}h1{font-size:18px;margin:0 0 6px}.muted{color:#91a0af;font-size:12px;line-height:1.45}.row{display:flex;gap:8px;align-items:center;margin-top:12px}button{border:1px solid #34414e;background:#121922;color:#e8edf3;border-radius:9px;padding:9px 12px;cursor:pointer}button:hover{background:#19232e}.stat{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.box{padding:9px;border:1px solid #202b36;border-radius:9px;background:#0b1016}.v{font-size:17px;font-weight:700}.k{font-size:11px;color:#81909f}.bar{height:5px;background:#1b2530;border-radius:5px;overflow:hidden;margin-top:10px}.bar i{display:block;height:100%;width:0;background:#76b7ff}.error{color:#ff9b9b;margin-top:8px;white-space:pre-wrap}.hint{position:fixed;right:14px;bottom:14px;padding:8px 11px;border-radius:9px;background:#080b0fcc;color:#82909e;font-size:12px}
+</style>
+</head>
+<body>
+<div id="view"></div>
+<section id="ui">
+<h1>Fruit Fly Brain — 3D</h1>
+<div class="muted">Browser viewer using the brain data loaded by the repository loader. Drag to orbit, wheel to zoom.</div>
+<div class="row"><button id="start">Pause simulation</button><button id="reload">Reload data</button></div>
+<div class="stat"><div class="box"><div class="v" id="neurons">—</div><div class="k">neurons loaded</div></div><div class="box"><div class="v" id="edges">—</div><div class="k">connections loaded</div></div><div class="box"><div class="v" id="active">—</div><div class="k">active sample</div></div><div class="box"><div class="v" id="fps">—</div><div class="k">render FPS</div></div></div>
+<div class="bar"><i id="progress"></i></div><div id="status" class="muted" style="margin-top:7px">Loading renderer…</div><div id="error" class="error"></div>
+</section><div class="hint">Mouse: orbit · Wheel: zoom · Space: pause</div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.180.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+const state={running:true,neurons:[],edges:[],clock:0};
+const $=id=>document.getElementById(id);function status(s){$('status').textContent=s}function fail(s){$('error').textContent=s}
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x05070a);
+const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.01,100);camera.position.set(0,0,6);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);$('view').appendChild(renderer.domElement);
+const controls=new THREE.OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.target.set(0,0,0);
+scene.add(new THREE.AmbientLight(0xffffff,.8));const light=new THREE.PointLight(0x99bbff,4,20);light.position.set(2,3,4);scene.add(light);
+const group=new THREE.Group();scene.add(group);let points=null,lines=null;
+function makeFly(){const g=new THREE.Group();const mat=new THREE.MeshStandardMaterial({color:0x59442f,roughness:.8});const dark=new THREE.MeshStandardMaterial({color:0x15191d,roughness:.5});
+for(const [s] of [[1.25],[.75],[.45]]){const m=new THREE.Mesh(new THREE.SphereGeometry(1,20,12),mat);m.scale.set(s,s,s);m.position.set((g.children.length-1)*1.0,0,0);g.add(m)}
+const eyeMat=new THREE.MeshStandardMaterial({color:0x181818});for(const x of [-.34,.34]){const e=new THREE.Mesh(new THREE.SphereGeometry(.23,16,10),eyeMat);e.position.set(-1.05,x,.34);g.add(e)}
+const wingMat=new THREE.MeshBasicMaterial({color:0x9aa6b2,transparent:true,opacity:.16,side:THREE.DoubleSide});for(const y of [-1,1]){const w=new THREE.Mesh(new THREE.PlaneGeometry(2.5,1),wingMat);w.rotation.set(.1,y>0?.18:-.18,y*.25);w.position.set(.25,y*.65,.1);g.add(w)}g.scale.setScalar(.7);return g}
+const fly=makeFly();fly.position.set(0,-1.5,0);group.add(fly);
+function buildData(neurons,edges){state.neurons=neurons||[];state.edges=edges||[];if(points)group.remove(points);if(lines)group.remove(lines);const max=Math.min(state.neurons.length,12000);const pos=new Float32Array(max*3);for(let i=0;i<max;i++){const n=state.neurons[i];pos[i*3]=Number(n[0]??n.x??0);pos[i*3+1]=Number(n[1]??n.y??0);pos[i*3+2]=Number(n[2]??n.z??0)}const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(pos,3));points=new THREE.Points(geo,new THREE.PointsMaterial({size:.018,color:0x70b7ff,transparent:true,opacity:.72}));group.add(points);
+const ec=Math.min(state.edges.length,9000),arr=new Float32Array(ec*6);for(let i=0;i<ec;i++){const e=state.edges[i];const a=state.neurons[e[0]],b=state.neurons[e[1]];if(!a||!b)continue;arr.set([a[0],a[1],a[2],b[0],b[1],b[2]],i*6)}const lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.BufferAttribute(arr,3));lines=new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0x37688e,transparent:true,opacity:.13}));group.add(lines);$('neurons').textContent=state.neurons.length.toLocaleString();$('edges').textContent=state.edges.length.toLocaleString();status('Brain data loaded.');}
+function normalize(raw){if(raw&&raw.neurons)return raw;if(raw&&raw.nodes)return {neurons:raw.nodes,edges:raw.edges||raw.connections||[]};return null}
+async function load(){fail('');$('progress').style.width='5%';status('Reading brain_raw.txt…');try{const r=await fetch('brain_raw.txt',{cache:'no-store'});if(!r.ok)throw Error('Could not read brain_raw.txt ('+r.status+').');const text=await r.text();$('progress').style.width='30%';let data=null;try{data=normalize(JSON.parse(text))}catch{}
+if(!data){const m=text.match(/\{[\s\S]*\}/);if(m)try{data=normalize(JSON.parse(m[0]))}catch{}}
+if(!data){status('Raw file found, but its serialization is not browser-readable JSON.');$('progress').style.width='100%';fail('The raw brain file was downloaded successfully, but its current format is not JSON. The loader itself is working.');return}
+$('progress').style.width='70%';buildData(data.neurons||[],data.edges||[]);$('progress').style.width='100%'}catch(e){fail(e.message);status('Load failed.')}}
+$('start').onclick=()=>{state.running=!state.running;$('start').textContent=state.running?'Pause simulation':'Start simulation'};$('reload').onclick=load;addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();$('start').click()}});addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+let last=performance.now(),frames=0;function loop(t){requestAnimationFrame(loop);const dt=(t-last)/1000;last=t;if(state.running){state.clock+=dt;if(points){const a=points.geometry.attributes.position.array;const count=a.length/3;for(let i=0;i<Math.min(count,2500);i++){const j=i*3;a[j+1]+=Math.sin(state.clock*2+i*.013)*.00012}}}group.rotation.y+=dt*.035;controls.update();renderer.render(scene,camera);frames++;if(frames%20===0){$('fps').textContent=Math.round(1/dt);$('active').textContent=state.neurons.length?Math.floor((Math.sin(state.clock*2)+1)*.5*state.neurons.length).toLocaleString():'—'}}requestAnimationFrame(loop);load();
+</script></body></html>
