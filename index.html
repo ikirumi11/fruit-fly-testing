@@ -5,304 +5,42 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Fruit Fly Brain — Loader</title>
 <style>
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#06080c;color:#edf3fa;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}
-body{display:flex;flex-direction:column}
-#loader{position:fixed;inset:0;display:flex;flex-direction:column;background:#06080c}
-.header{padding:18px 20px 15px;background:#0b0f15;border-bottom:1px solid #202936}
-.title{font-size:21px;font-weight:800;letter-spacing:.2px}
-.subtitle{margin-top:4px;color:#8996a5;font-size:13px}
-.overall{height:8px;margin-top:15px;background:#171e27;border-radius:99px;overflow:hidden}
-.overall i{display:block;height:100%;width:0;background:#72b8ff;transition:width .1s}
-.stats{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;color:#788696;font-size:12px}
-.stats b{color:#edf3fa}
-.files{flex:1;overflow:auto;padding:12px 14px 30px}
-.file{background:#0b1016;border:1px solid #202936;border-radius:10px;padding:10px 12px;margin-bottom:8px}
-.file.active{border-color:#355473}
-.file.done{border-color:#284936}
-.file.error{border-color:#633b3b}
-.line{display:flex;align-items:center;gap:10px}
-.name{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}
-.state{font-size:11px;color:#778696;white-space:nowrap}
-.done .state{color:#83d9a5}.active .state{color:#8fcaff}.error .state{color:#ff9a9a}
-.bar{height:4px;background:#171f29;border-radius:99px;overflow:hidden;margin-top:8px}
-.bar i{display:block;height:100%;width:0;background:#64aef3}
-.done .bar i{background:#70c98f}.error .bar i{background:#ed6e6e}
-.meta{display:flex;justify-content:space-between;gap:8px;margin-top:6px;color:#667585;font-size:10px}
-.footer{padding:10px 14px;border-top:1px solid #202936;color:#687686;font-size:11px;background:#090d12}
-#site{position:fixed;inset:0;width:100%;height:100%;border:0;display:none;background:#fff}
-.ready #loader{display:none}.ready #site{display:block}
-#error{display:none;position:fixed;inset:0;padding:28px;background:#080b10;color:#fff;overflow:auto}
-#error h2{margin:0 0 8px}.errorText{color:#ff9b9b;white-space:pre-wrap;font:13px/1.5 monospace}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#06080c;color:#edf3fa;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}body{display:flex;flex-direction:column}.header{padding:18px 20px 15px;background:#0b0f15;border-bottom:1px solid #202936}.title{font-size:21px;font-weight:800}.subtitle{margin-top:4px;color:#8996a5;font-size:13px}.overall{height:8px;margin-top:15px;background:#171e27;border-radius:99px;overflow:hidden}.overall i{display:block;height:100%;width:0;background:#72b8ff;transition:width .1s}.stats{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;color:#788696;font-size:12px}.stats b{color:#edf3fa}.files{flex:1;overflow:auto;padding:12px 14px 30px}.file{background:#0b1016;border:1px solid #202936;border-radius:10px;padding:10px 12px;margin-bottom:8px}.file.active{border-color:#355473}.file.done{border-color:#284936}.file.error{border-color:#633b3b}.line{display:flex;align-items:center;gap:10px}.name{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}.state{font-size:11px;color:#778696;white-space:nowrap}.done .state{color:#83d9a5}.active .state{color:#8fcaff}.error .state{color:#ff9a9a}.bar{height:4px;background:#171f29;border-radius:99px;overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;width:0;background:#64aef3}.done .bar i{background:#70c98f}.error .bar i{background:#ed6e6e}.meta{display:flex;justify-content:space-between;gap:8px;margin-top:6px;color:#667585;font-size:10px}.footer{padding:10px 14px;border-top:1px solid #202936;color:#687686;font-size:11px;background:#090d12}#site{position:fixed;inset:0;width:100%;height:100%;border:0;display:none;background:#fff}.ready #loader{display:none}.ready #site{display:block}#error{display:none;position:fixed;inset:0;padding:28px;background:#080b10;color:#fff;overflow:auto}#error h2{margin:0 0 8px}.errorText{color:#ff9b9b;white-space:pre-wrap;font:13px/1.5 monospace}
 </style>
 </head>
 <body>
 <div id="loader">
-<header class="header">
-<div class="title">Preparing Fruit Fly Brain</div>
-<div class="subtitle" id="status">Connecting to GitHub…</div>
-<div class="overall"><i id="overallBar"></i></div>
-<div class="stats">
-<span>Files <b id="count">0</b></span>
-<span>Done <b id="done">0</b></span>
-<span>Downloaded <b id="downloaded">0 B</b></span>
-<span>Total <b id="total">—</b></span>
-<span>Speed <b id="speed">—</b></span>
-<span>ETA <b id="eta">—</b></span>
-</div>
-</header>
-<main class="files" id="files"></main>
-<footer class="footer" id="footer">Downloading the complete repository once. The site will only start after every file finishes.</footer>
-</div>
-<div id="error"><h2>Loader error</h2><div class="errorText" id="errorText"></div></div>
-<iframe id="site" sandbox="allow-scripts allow-forms allow-modals allow-popups allow-downloads allow-same-origin"></iframe>
+<header class="header"><div class="title">Preparing Fruit Fly Brain</div><div class="subtitle" id="status">Connecting to download server…</div><div class="overall"><i id="overallBar"></i></div><div class="stats"><span>Files <b id="count">0</b></span><span>Done <b id="done">0</b></span><span>Downloaded <b id="downloaded">0 B</b></span><span>Total <b id="total">—</b></span><span>Speed <b id="speed">—</b></span><span>ETA <b id="eta">—</b></span></div></header>
+<main class="files" id="files"></main><footer class="footer">Downloading the repository locally first. The viewer will start only after the files finish.</footer></div>
+<div id="error"><h2>Loader error</h2><div class="errorText" id="errorText"></div></div><iframe id="site" sandbox="allow-scripts allow-forms allow-modals allow-popups allow-downloads allow-same-origin"></iframe>
 <script>
-(() => {
-"use strict";
-
-const OWNER="ikirumi11";
-const REPO="fruit-fly-testing";
-const BRANCH="main";
-const API=`https://api.github.com/repos/${OWNER}/${REPO}/git/trees/${encodeURIComponent(BRANCH)}?recursive=1&cachebust=${Date.now()}`;
-const RAW=`https://raw.githubusercontent.com/${OWNER}/${REPO}/${encodeURIComponent(BRANCH)}/`;
-const CONCURRENCY=4;
-
-const $=id=>document.getElementById(id);
-const rows=new Map();
-const downloadedFiles=new Map();
-const objectUrls=new Map();
-let tree=[];
-let totalBytes=0;
-let downloadedBytes=0;
-let completed=0;
-let startedAt=0;
-let failed=false;
-
-function bytes(n){
- if(!Number.isFinite(n))return "—";
- const u=["B","KB","MB","GB"];let i=0;
- while(n>=1024&&i<3){n/=1024;i++}
- return (i&&n<10?n.toFixed(1):Math.round(n))+" "+u[i];
-}
-function time(s){
- if(!Number.isFinite(s)||s<0)return "—";
- s=Math.ceil(s);
- if(s<60)return s+"s";
- const m=Math.floor(s/60),r=s%60;
- if(m<60)return m+"m "+r+"s";
- return Math.floor(m/60)+"h "+(m%60)+"m";
-}
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
-function mime(path){
- const e=path.split(".").pop().toLowerCase();
- return ({html:"text/html",htm:"text/html",css:"text/css",js:"text/javascript",mjs:"text/javascript",json:"application/json",txt:"text/plain",xml:"application/xml",svg:"image/svg+xml",png:"image/png",jpg:"image/jpeg",jpeg:"image/jpeg",gif:"image/gif",webp:"image/webp",avif:"image/avif",ico:"image/x-icon",mp3:"audio/mpeg",wav:"audio/wav",ogg:"audio/ogg",mp4:"video/mp4",webm:"video/webm",wasm:"application/wasm",glb:"model/gltf-binary",gltf:"model/gltf+json"})[e]||"application/octet-stream";
-}
-function addRow(item){
- const el=document.createElement("div");
- el.className="file";
- el.innerHTML=`<div class="line"><div class="name" title="${esc(item.path)}">${esc(item.path)}</div><div class="state">Waiting</div></div><div class="bar"><i></i></div><div class="meta"><span class="pct">0%</span><span class="size">${bytes(item.size||0)}</span><span class="eta">ETA —</span></div>`;
- $("files").appendChild(el);
- rows.set(item.path,{el,state:el.querySelector(".state"),bar:el.querySelector(".bar i"),pct:el.querySelector(".pct"),eta:el.querySelector(".eta")});
-}
-function row(path,pct,state,eta){
- const r=rows.get(path);if(!r)return;
- r.el.classList.toggle("active",state==="Downloading");
- r.el.classList.toggle("done",state==="Done");
- r.el.classList.toggle("error",state==="Error");
- r.state.textContent=state;
- r.bar.style.width=Math.max(0,Math.min(100,pct))+"%";
- r.pct.textContent=Math.round(pct)+"%";
- r.eta.textContent="ETA "+(eta||"—");
-}
-function overall(){
- const elapsed=(performance.now()-startedAt)/1000;
- const rate=elapsed>0?downloadedBytes/elapsed:0;
- const remaining=Math.max(0,totalBytes-downloadedBytes);
- $("overallBar").style.width=(totalBytes?Math.min(100,downloadedBytes/totalBytes*100):0)+"%";
- $("downloaded").textContent=bytes(downloadedBytes);
- $("done").textContent=completed;
- $("speed").textContent=rate?bytes(rate)+"/s":"—";
- $("eta").textContent=rate?time(remaining/rate):"—";
-}
-async function getTree(){
- const r=await fetch(API,{cache:"no-store",headers:{Accept:"application/vnd.github+json"}});
- if(!r.ok)throw new Error("GitHub file list failed: HTTP "+r.status+" "+r.statusText);
- const j=await r.json();
- if(j.truncated)throw new Error("GitHub returned a truncated repository tree.");
- return (j.tree||[]).filter(x=>x.type==="blob");
-}
-async function download(item){
- const path=item.path;
- row(path,0,"Downloading",null);
- const started=performance.now();
- let response;
- try{
-   const url=RAW+path.split("/").map(encodeURIComponent).join("/")+`?loader=${Date.now()}`;
-   response=await fetch(url,{cache:"no-store",headers:{Accept:"*/*"}});
-   if(!response.ok)throw new Error("HTTP "+response.status+" "+response.statusText);
-   const reader=response.body?.getReader();
-   const chunks=[];
-   let got=0;
-   const expected=item.size||Number(response.headers.get("content-length"))||0;
-   if(reader){
-     while(true){
-       const part=await reader.read();
-       if(part.done)break;
-       chunks.push(part.value);
-       got+=part.value.byteLength;
-       downloadedBytes+=part.value.byteLength;
-       const elapsed=(performance.now()-started)/1000;
-       const rate=elapsed>0?got/elapsed:0;
-       row(path,expected?got/expected*100:0,"Downloading",rate&&expected?time((expected-got)/rate):null);
-       overall();
-     }
-   }else{
-     const b=new Uint8Array(await response.arrayBuffer());
-     chunks.push(b);got=b.byteLength;downloadedBytes+=got;overall();
-   }
-   const data=new Uint8Array(got);
-   let offset=0;
-   for(const c of chunks){data.set(c,offset);offset+=c.byteLength;}
-   downloadedFiles.set(path,{bytes:data,type:mime(path)});
-   completed++;
-   row(path,100,"Done",null);
-   overall();
- }catch(e){
-   row(path,0,"Error",null);
-   throw new Error(path+": "+e.message);
- }
-}
-async function worker(queue){
- while(true){
-   const item=queue.shift();
-   if(!item)return;
-   await download(item);
-   $("status").textContent=`Downloading repository… ${completed}/${tree.length} files complete`;
- }
-}
-function makeUrl(path){
- const f=downloadedFiles.get(path);if(!f)return null;
- if(objectUrls.has(path))return objectUrls.get(path);
- const u=URL.createObjectURL(new Blob([f.bytes],{type:f.type}));
- objectUrls.set(path,u);return u;
-}
-function isText(type){return type.startsWith("text/")||/javascript|json|xml|svg/.test(type);}
-function text(path){
- const f=downloadedFiles.get(path);if(!f||!isText(f.type))return null;
- return new TextDecoder().decode(f.bytes);
-}
-function cleanPath(path){return path.replace(/^\.\//,"").replace(/^\//,"");}
-function resolvePath(base,value){
- if(!value)return null;
- value=value.trim();
- if(/^(https?:|data:|blob:|javascript:|mailto:|tel:|#|\/\/)/i.test(value))return null;
- const parts=(value.startsWith("/")?value.slice(1):base.split("/").slice(0,-1).concat(value.split("/")).join("/")).split("/");
- const out=[];
- for(const p of parts){if(!p||p===".")continue;if(p==="..")out.pop();else out.push(p)}
- return cleanPath(out.join("/"));
-}
-function rewriteCss(css,current){
- return css.replace(/url\(\s*(["']?)([^"')]+)\1\s*\)/gi,(m,q,u)=>{
-   const p=resolvePath(current,u);const local=p&&downloadedFiles.has(p)?makeUrl(p):null;
-   return local?`url("${local}")`:m;
- });
-}
-function rewriteJs(js,current){
- return js.replace(/\bfetch\(\s*(["'])([^"']+)\1/g,(m,q,u)=>{
-   const p=resolvePath(current,u);const local=p&&downloadedFiles.has(p)?makeUrl(p):null;
-   return local?`fetch(${q}${local}${q}`:m;
- }).replace(/\bimport\(\s*(["'])([^"']+)\1/g,(m,q,u)=>{
-   const p=resolvePath(current,u);const local=p&&downloadedFiles.has(p)?makeUrl(p):null;
-   return local?`import(${q}${local}${q}`:m;
- }).replace(/\bfrom\s*(["'])([^"']+)\1/g,(m,q,u)=>{
-   const p=resolvePath(current,u);const local=p&&downloadedFiles.has(p)?makeUrl(p):null;
-   return local?`from ${q}${local}${q}`:m;
- });
-}
-function buildHtml(source,current){
- const doc=new DOMParser().parseFromString(source,"text/html");
- doc.querySelectorAll("base").forEach(x=>x.remove());
- for(const el of doc.querySelectorAll("link[href],img[src],source[src],video[src],audio[src],iframe[src],object[data],input[src],script[src],image[href]")){
-   for(const attr of ["href","src","data"]){
-     if(!el.hasAttribute(attr))continue;
-     const value=el.getAttribute(attr);const p=resolvePath(current,value);const local=p&&downloadedFiles.has(p)?makeUrl(p):null;
-     if(local)el.setAttribute(attr,local);
-   }
- }
- for(const el of doc.querySelectorAll("style"))el.textContent=rewriteCss(el.textContent,current);
- for(const el of doc.querySelectorAll("[style]"))el.setAttribute("style",rewriteCss(el.getAttribute("style"),current));
- for(const el of [...doc.querySelectorAll("link[rel~='stylesheet']")]){
-   const p=resolvePath(current,el.getAttribute("href"));
-   const css=p&&text(p);
-   if(css!=null){const style=doc.createElement("style");style.textContent=rewriteCss(css,p);el.replaceWith(style);}
- }
- for(const el of [...doc.querySelectorAll("script[src]")]){
-   const p=resolvePath(current,el.getAttribute("src"));
-   const js=p&&text(p);
-   if(js!=null){el.removeAttribute("src");el.textContent=rewriteJs(js,p);}
- }
- for(const el of doc.querySelectorAll("script:not([src])"))el.textContent=rewriteJs(el.textContent,current);
- const bridge=doc.createElement("script");
- const map={};
- for(const [path] of downloadedFiles)map[path]=makeUrl(path);
- bridge.textContent=`window.__FRUIT_FLY_LOCAL_FILES=${JSON.stringify(map)};window.__FRUIT_FLY_LOCAL_LOADED=true;`;
- (doc.body||doc.documentElement).appendChild(bridge);
- return "<!doctype html>"+doc.documentElement.outerHTML;
-}
-function showError(e){
- failed=true;
- $("errorText").textContent=String(e?.stack||e);
- $("error").style.display="block";
- $("loader").style.display="none";
-}
-async function start(){
- if(failed)return;
- try{
-   startedAt=performance.now();
-   $("status").textContent="Reading GitHub repository…";
-   tree=await getTree();
-   if(!tree.length)throw new Error("GitHub returned no files.");
-   totalBytes=tree.reduce((n,x)=>n+(x.size||0),0);
-   $("count").textContent=tree.length;
-   $("total").textContent=bytes(totalBytes);
-   tree.forEach(addRow);
-   overall();
-   $("status").textContent=`Downloading ${tree.length} files…`;
-   const queue=[...tree];
-   const workers=Array.from({length:Math.min(CONCURRENCY,queue.length)},()=>worker(queue));
-   await Promise.all(workers);
-   if(completed!==tree.length||downloadedFiles.size!==tree.length)throw new Error(`Only ${completed}/${tree.length} files downloaded.`);
-   $("status").textContent="All files downloaded. Starting local site…";
-   $("footer").textContent=`Downloaded ${downloadedFiles.size} files. No second repository download will be made.`;
-
-   let entry=tree.find(x=>x.path.toLowerCase()==="brain.html")?.path;
-   if(!entry)entry=tree.find(x=>x.path.toLowerCase()==="site.html")?.path;
-   if(!entry)entry=tree.find(x=>x.path.toLowerCase()==="viewer.html")?.path;
-   if(!entry)entry=tree.find(x=>x.path.toLowerCase()==="index.html")?.path;
-   if(!entry)throw new Error("No HTML entry file found.");
-
-   const source=text(entry);
-   if(source==null)throw new Error(entry+" is not a text HTML file.");
-
-   const loaderMarker=source.includes("Fruit Fly Brain — Loader")||source.includes("__FRUIT_FLY_LOCAL_LOADED")||source.includes("Preparing Fruit Fly Brain");
-   if(loaderMarker){
-     const candidates=tree.filter(x=>/\.html?$/i.test(x.path)&&x.path!==entry);
-     if(candidates.length){
-       entry=candidates[0].path;
-       $("status").textContent=`Loader detected. Launching ${entry} from downloaded files…`;
-     }else{
-       throw new Error("The repository currently contains only the loader as index.html. Add the actual fruit-fly viewer as brain.html or site.html so the loader has a separate site to launch.");
-     }
-   }
-
-   const finalSource=text(entry);
-   const output=buildHtml(finalSource,entry);
-   $("site").srcdoc=output;
-   document.body.classList.add("ready");
- }catch(e){showError(e);console.error(e)}
-}
+(()=>{
+'use strict';
+const VERSION='567da8c4a2a3a2be03d234a9642d7e7f4e4cb2db';
+const CDN='https://cdn.jsdelivr.net/gh/ikirumi11/fruit-fly-testing@main/';
+const FILES=[
+ ['brain.html',19000],
+ ['brain_raw.txt',23450165],
+ ['prepare_brain.py',3695],
+ ['README.md',996],
+ ['index.html',14000]
+];
+const $=id=>document.getElementById(id),rows=new Map(),files=new Map(),urls=new Map();
+let total=FILES.reduce((a,x)=>a+x[1],0),done=0,got=0,start=performance.now();
+$('count').textContent=FILES.length;$('total').textContent=fmt(total);
+function fmt(n){if(!isFinite(n))return '—';const u=['B','KB','MB','GB'];let i=0;while(n>=1024&&i<3){n/=1024;i++}return (i&&n<10?n.toFixed(1):Math.round(n))+' '+u[i]}
+function eta(s){if(!isFinite(s)||s<0)return '—';s=Math.ceil(s);if(s<60)return s+'s';return Math.floor(s/60)+'m '+s%60+'s'}
+function row(path,size){const e=document.createElement('div');e.className='file';e.innerHTML='<div class="line"><div class="name">'+path+'</div><div class="state">Waiting</div></div><div class="bar"><i></i></div><div class="meta"><span class="pct">0%</span><span class="size">'+fmt(size)+'</span><span class="eta">ETA —</span></div>';$('files').appendChild(e);rows.set(path,{e,state:e.querySelector('.state'),bar:e.querySelector('.bar i'),pct:e.querySelector('.pct'),eta:e.querySelector('.eta')})}
+function setrow(path,p,state,et){const r=rows.get(path);r.e.className='file '+(state==='Downloading'?'active ':state==='Done'?'done ':state==='Error'?'error ':'');r.state.textContent=state;r.bar.style.width=Math.min(100,p)+'%';r.pct.textContent=Math.round(p)+'%';r.eta.textContent='ETA '+(et||'—')}
+FILES.forEach(x=>row(x[0],x[1]));
+function progress(){const sec=(performance.now()-start)/1000,rate=sec?got/sec:0;$('overallBar').style.width=Math.min(100,got/total*100)+'%';$('downloaded').textContent=fmt(got);$('done').textContent=done;$('speed').textContent=rate?fmt(rate)+'/s':'—';$('eta').textContent=rate?eta((total-got)/rate):'—'}
+async function download(path,size){setrow(path,0,'Downloading');const url=CDN+path.split('/').map(encodeURIComponent).join('/')+'?v='+VERSION;try{const r=await fetch(url,{cache:'no-store',mode:'cors'});if(!r.ok)throw Error('HTTP '+r.status+' '+r.statusText);if(!r.body)throw Error('Browser did not provide a readable download stream.');const reader=r.body.getReader(),parts=[];let n=0;while(true){const x=await reader.read();if(x.done)break;parts.push(x.value);n+=x.value.byteLength;got+=x.value.byteLength;setrow(path,size?Math.min(100,n/size*100):0,'Downloading',null);progress()}const data=new Uint8Array(n);let o=0;for(const p of parts){data.set(p,o);o+=p.byteLength}files.set(path,{data,type:mime(path)});done++;setrow(path,100,'Done');progress()}catch(e){setrow(path,0,'Error');throw new Error(path+': '+e.message)}}
+function mime(p){const e=p.split('.').pop().toLowerCase();return ({html:'text/html',css:'text/css',js:'text/javascript',json:'application/json',txt:'text/plain',py:'text/plain',md:'text/markdown'})[e]||'application/octet-stream'}
+function blob(path){if(urls.has(path))return urls.get(path);const f=files.get(path);if(!f)return null;const u=URL.createObjectURL(new Blob([f.data],{type:f.type}));urls.set(path,u);return u}
+function rel(base,v){if(!v||/^(https?:|data:|blob:|javascript:|mailto:|tel:|#|\/\/)/i.test(v))return null;const a=(base.split('/').slice(0,-1).concat(v.split('/'))).join('/').split('/'),o=[];for(const p of a){if(!p||p==='.'){continue}else if(p==='..')o.pop();else o.push(p)}return o.join('/')}
+function build(source,path){const d=new DOMParser().parseFromString(source,'text/html');d.querySelectorAll('base').forEach(x=>x.remove());d.querySelectorAll('link[href],img[src],source[src],video[src],audio[src],script[src],iframe[src],object[data]').forEach(el=>{for(const a of ['href','src','data']){if(!el.hasAttribute(a))continue;const p=rel(path,el.getAttribute(a));if(p&&files.has(p))el.setAttribute(a,blob(p))}});for(const s of [...d.querySelectorAll('script[src]')]){const p=rel(path,s.getAttribute('src'));if(p&&files.has(p)){const f=files.get(p);if(f.type.startsWith('text/')){s.removeAttribute('src');s.textContent=new TextDecoder().decode(f.data)}}}const bridge=d.createElement('script');bridge.textContent='window.__FRUIT_FLY_LOCAL_LOADED=true;';d.body.appendChild(bridge);return '<!doctype html>'+d.documentElement.outerHTML}
+function error(e){$('errorText').textContent=e.stack||e;$('error').style.display='block';$('loader').style.display='none'}
+async function start(){try{$('status').textContent='Downloading files from CDN…';for(const [p,s] of FILES)await download(p,s);$('status').textContent='Starting local viewer…';const source=new TextDecoder().decode(files.get('brain.html').data);$('site').srcdoc=build(source,'brain.html');document.body.classList.add('ready')}catch(e){error(e)}}
 start();
 })();
-</script>
-</body>
-</html>
+</script></body></html>
