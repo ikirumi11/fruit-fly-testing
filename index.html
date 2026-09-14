@@ -1,62 +1,308 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>GitHub Site Builder</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Fruit Fly Brain — Loader</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07090d;color:#edf2f7;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}#loader{position:fixed;inset:0;display:flex;flex-direction:column;background:#07090d;z-index:5}.top{padding:18px 20px 14px;border-bottom:1px solid #202733;background:#0c1016}.title{font-size:20px;font-weight:750}.sub{margin-top:4px;color:#8d99a8;font-size:13px}.overall{height:7px;background:#1a2029;border-radius:99px;overflow:hidden;margin-top:14px}.overall i{display:block;height:100%;width:0;background:#72b7ff;transition:width .12s}.summary{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;color:#9da8b5;font-size:12px}.summary b{color:#edf2f7}.files{flex:1;overflow:auto;padding:12px 14px 30px}.file{border:1px solid #1f2731;background:#0c1117;border-radius:10px;padding:11px 12px;margin-bottom:8px}.line{display:flex;gap:10px;align-items:center}.name{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.state{font-size:11px;color:#82909e;white-space:nowrap}.bar{height:4px;background:#18202a;border-radius:99px;overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;width:0;background:#65aef5}.meta{display:flex;justify-content:space-between;margin-top:6px;color:#71808f;font-size:11px}.done .state{color:#82d6a4}.error .state{color:#ff9292}.error .bar i{background:#ff7373}.active{border-color:#31506d}.active .state{color:#8bc7ff}#site{position:fixed;inset:0;width:100%;height:100%;border:0;display:none;background:#fff;z-index:2}.showSite #loader{display:none}.showSite #site{display:block}.siteTop{position:fixed;z-index:3;top:10px;right:10px;display:none}.showSite .siteTop{display:block}.siteTop button{border:1px solid #34414e;background:#10161d;color:#fff;border-radius:8px;padding:8px 11px;cursor:pointer;opacity:.88}.siteTop button:hover{opacity:1}.foot{padding:10px 14px;border-top:1px solid #202733;color:#6f7d8b;font-size:11px}.hidden{display:none!important}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#06080c;color:#edf3fa;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+body{display:flex;flex-direction:column}
+#loader{position:fixed;inset:0;display:flex;flex-direction:column;background:#06080c}
+.header{padding:18px 20px 15px;background:#0b0f15;border-bottom:1px solid #202936}
+.title{font-size:21px;font-weight:800;letter-spacing:.2px}
+.subtitle{margin-top:4px;color:#8996a5;font-size:13px}
+.overall{height:8px;margin-top:15px;background:#171e27;border-radius:99px;overflow:hidden}
+.overall i{display:block;height:100%;width:0;background:#72b8ff;transition:width .1s}
+.stats{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;color:#788696;font-size:12px}
+.stats b{color:#edf3fa}
+.files{flex:1;overflow:auto;padding:12px 14px 30px}
+.file{background:#0b1016;border:1px solid #202936;border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.file.active{border-color:#355473}
+.file.done{border-color:#284936}
+.file.error{border-color:#633b3b}
+.line{display:flex;align-items:center;gap:10px}
+.name{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}
+.state{font-size:11px;color:#778696;white-space:nowrap}
+.done .state{color:#83d9a5}.active .state{color:#8fcaff}.error .state{color:#ff9a9a}
+.bar{height:4px;background:#171f29;border-radius:99px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;width:0;background:#64aef3}
+.done .bar i{background:#70c98f}.error .bar i{background:#ed6e6e}
+.meta{display:flex;justify-content:space-between;gap:8px;margin-top:6px;color:#667585;font-size:10px}
+.footer{padding:10px 14px;border-top:1px solid #202936;color:#687686;font-size:11px;background:#090d12}
+#site{position:fixed;inset:0;width:100%;height:100%;border:0;display:none;background:#fff}
+.ready #loader{display:none}.ready #site{display:block}
+#error{display:none;position:fixed;inset:0;padding:28px;background:#080b10;color:#fff;overflow:auto}
+#error h2{margin:0 0 8px}.errorText{color:#ff9b9b;white-space:pre-wrap;font:13px/1.5 monospace}
 </style>
 </head>
 <body>
 <div id="loader">
-<div class="top">
-<div class="title">Building GitHub site</div>
-<div class="sub" id="status">Connecting to GitHub…</div>
+<header class="header">
+<div class="title">Preparing Fruit Fly Brain</div>
+<div class="subtitle" id="status">Connecting to GitHub…</div>
 <div class="overall"><i id="overallBar"></i></div>
-<div class="summary"><span>Files: <b id="fileCount">0</b></span><span>Done: <b id="doneCount">0</b></span><span>Total: <b id="totalSize">—</b></span><span>Downloaded: <b id="downloaded">0 B</b></span><span>ETA: <b id="eta">—</b></span></div>
+<div class="stats">
+<span>Files <b id="count">0</b></span>
+<span>Done <b id="done">0</b></span>
+<span>Downloaded <b id="downloaded">0 B</b></span>
+<span>Total <b id="total">—</b></span>
+<span>Speed <b id="speed">—</b></span>
+<span>ETA <b id="eta">—</b></span>
 </div>
-<div class="files" id="files"></div>
-<div class="foot" id="foot">Every repository file is downloaded before the site is shown.</div>
+</header>
+<main class="files" id="files"></main>
+<footer class="footer" id="footer">Downloading the complete repository once. The site will only start after every file finishes.</footer>
 </div>
-<iframe id="site" sandbox="allow-scripts allow-forms allow-modals allow-popups allow-downloads"></iframe>
-<div class="siteTop"><button onclick="location.reload()">Reload loader</button></div>
+<div id="error"><h2>Loader error</h2><div class="errorText" id="errorText"></div></div>
+<iframe id="site" sandbox="allow-scripts allow-forms allow-modals allow-popups allow-downloads allow-same-origin"></iframe>
 <script>
+(() => {
+"use strict";
+
 const OWNER="ikirumi11";
 const REPO="fruit-fly-testing";
 const BRANCH="main";
-const ROOT="";
-const API=`https://api.github.com/repos/${OWNER}/${REPO}/git/trees/${encodeURIComponent(BRANCH)}?recursive=1`;
+const API=`https://api.github.com/repos/${OWNER}/${REPO}/git/trees/${encodeURIComponent(BRANCH)}?recursive=1&cachebust=${Date.now()}`;
 const RAW=`https://raw.githubusercontent.com/${OWNER}/${REPO}/${encodeURIComponent(BRANCH)}/`;
+const CONCURRENCY=4;
+
 const $=id=>document.getElementById(id);
-const filesBox=$("files");
-const fileRows=new Map();
-const fileData=new Map();
-const blobUrls=new Map();
-let totalBytes=0,downloadedBytes=0,done=0,startTime=0;
-function fmtBytes(n){if(!Number.isFinite(n)||n<0)return "—";const u=["B","KB","MB","GB"];let i=0;while(n>=1024&&i<u.length-1){n/=1024;i++}return (n<10&&i? n.toFixed(1):Math.round(n))+" "+u[i]}
-function fmtTime(sec){if(!Number.isFinite(sec)||sec<0)return "—";sec=Math.ceil(sec);if(sec<60)return sec+"s";const m=Math.floor(sec/60),s=sec%60;if(m<60)return m+"m "+s+"s";return Math.floor(m/60)+"h "+(m%60)+"m"}
-function esc(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
-function addRow(path,size){const el=document.createElement("div");el.className="file";el.innerHTML=`<div class="line"><div class="name" title="${esc(path)}">${esc(path)}</div><div class="state">Waiting</div></div><div class="bar"><i></i></div><div class="meta"><span>0%</span><span>${fmtBytes(size)}</span><span>ETA —</span></div>`;filesBox.appendChild(el);fileRows.set(path,{el,state:el.querySelector(".state"),bar:el.querySelector("i"),pct:el.querySelector(".meta span:nth-child(1)"),size:el.querySelector(".meta span:nth-child(2)"),eta:el.querySelector(".meta span:nth-child(3)")})}
-function setRow(path,pct,state,eta){const r=fileRows.get(path);if(!r)return;r.el.classList.toggle("active",state==="Downloading");r.el.classList.toggle("done",state==="Done");r.el.classList.toggle("error",state==="Error");r.state.textContent=state;r.bar.style.width=Math.max(0,Math.min(100,pct))+"%";r.pct.textContent=Math.round(pct)+"%";r.eta.textContent="ETA "+(eta||"—")}
-function setOverall(){const elapsed=(performance.now()-startTime)/1000;const speed=elapsed>0?downloadedBytes/elapsed:0;const remaining=Math.max(0,totalBytes-downloadedBytes);$("downloaded").textContent=fmtBytes(downloadedBytes);$("overallBar").style.width=(totalBytes?Math.min(100,downloadedBytes/totalBytes*100):done/(Math.max(1,fileRows.size))*100)+"%";$("doneCount").textContent=done;$("eta").textContent=speed>0?fmtTime(remaining/speed):"—"}
-async function getTree(){const r=await fetch(API,{headers:{Accept:"application/vnd.github+json"},cache:"no-store"});if(!r.ok)throw Error("GitHub API error: "+r.status+" "+r.statusText);const j=await r.json();if(j.truncated)throw Error("GitHub returned a truncated file list. This repository is too large for one recursive tree request.");return (j.tree||[]).filter(x=>x.type==="blob")}
-function findIndex(paths){const clean=x=>x.replace(/^\.\//,"").replace(/^\//,"").toLowerCase();const list=paths.map(x=>x.path);if(ROOT){const exact=clean(ROOT+"/index.html");const hit=list.find(x=>clean(x)===exact);if(hit)return hit}return list.find(x=>clean(x)==="index.html")||list.find(x=>clean(x).endsWith("/index.html"))||null}
-function relative(base,value){const b=base.split("/");b.pop();const v=value.split("/");for(const p of v){if(!p||p===".")continue;if(p==="..")b.pop();else b.push(p)}return b.join("/")}
-function localPath(value,current){if(!value)return null;value=value.trim();if(/^(https?:|data:|blob:|javascript:|mailto:|tel:|#|\/\/)/i.test(value))return null;if(value.startsWith("/"))return value.slice(1);return relative(current,value)}
-function makeObjectUrl(path,bytes,mime){const old=blobUrls.get(path);if(old)URL.revokeObjectURL(old);const u=URL.createObjectURL(new Blob([bytes],{type:mime||"application/octet-stream"}));blobUrls.set(path,u);return u}
-function mime(path){const e=path.split(".").pop().toLowerCase();return ({html:"text/html",htm:"text/html",css:"text/css",js:"text/javascript",mjs:"text/javascript",json:"application/json",svg:"image/svg+xml",txt:"text/plain",xml:"application/xml",png:"image/png",jpg:"image/jpeg",jpeg:"image/jpeg",gif:"image/gif",webp:"image/webp",avif:"image/avif",ico:"image/x-icon",mp3:"audio/mpeg",wav:"audio/wav",ogg:"audio/ogg",mp4:"video/mp4",webm:"video/webm",wasm:"application/wasm",glb:"model/gltf-binary",gltf:"model/gltf+json"})[e]||"application/octet-stream"}
-async function downloadFile(item,index,total){const path=item.path;setRow(path,0,"Downloading",null);const t0=performance.now();try{const r=await fetch(RAW+path.split("/").map(encodeURIComponent).join("/"),{cache:"no-store"});if(!r.ok)throw Error(r.status+" "+r.statusText);const expected=Number(r.headers.get("content-length"))||item.size||0;const reader=r.body?r.body.getReader():null;let chunks=[],got=0;if(reader){while(true){const x=await reader.read();if(x.done)break;chunks.push(x.value);got+=x.value.byteLength;downloadedBytes+=x.value.byteLength;const pct=expected?got/expected*100:0;const elapsed=(performance.now()-t0)/1000;const speed=elapsed>0?got/elapsed:0;setRow(path,pct,"Downloading",speed&&expected?fmtTime(Math.max(0,expected-got)/speed):null);setOverall()}}else{const b=new Uint8Array(await r.arrayBuffer());chunks=[b];got=b.byteLength;downloadedBytes+=got;setOverall()}let bytes=new Uint8Array(got),at=0;for(const c of chunks){bytes.set(c,at);at+=c.byteLength}const type=mime(path);fileData.set(path,{bytes,type,text:(type.startsWith("text/")||type.includes("javascript")||type.includes("json")||type.includes("xml")||type.includes("svg"))?new TextDecoder().decode(bytes):null});makeObjectUrl(path,bytes,type);done++;setRow(path,100,"Done",null);setOverall()}catch(e){setRow(path,0,"Error",null);throw Error(path+": "+e.message)}}
-function rewriteCss(css,current){return css.replace(/url\(\s*(["']?)([^"')]+)\1\s*\)/gi,(m,q,u)=>{const p=localPath(u,current);return p&&blobUrls.has(p)?`url("${blobUrls.get(p)}")`:m})}
-function rewriteHtml(html,current){const parser=new DOMParser();const doc=parser.parseFromString(html,"text/html");doc.querySelectorAll("base").forEach(x=>x.remove());for(const el of doc.querySelectorAll("script[src],link[href],img[src],source[src],video[src],audio[src],iframe[src],object[data],input[src],image[href]")){for(const attr of ["src","href","data"]){if(!el.hasAttribute(attr))continue;const v=el.getAttribute(attr),p=localPath(v,current);if(p&&blobUrls.has(p))el.setAttribute(attr,blobUrls.get(p));}}
-for(const el of doc.querySelectorAll("style"))el.textContent=rewriteCss(el.textContent,current);for(const el of doc.querySelectorAll("[style]"))el.setAttribute("style",rewriteCss(el.getAttribute("style"),current));
-for(const el of doc.querySelectorAll("link[rel~='stylesheet']")){const v=el.getAttribute("href"),p=localPath(v,current);if(p&&fileData.get(p)?.text){const style=doc.createElement("style");style.textContent=rewriteCss(fileData.get(p).text,p);el.replaceWith(style)}}
-for(const el of doc.querySelectorAll("script[src]")){const v=el.getAttribute("src");const p=[...blobUrls].find(([k,u])=>u===v)?.[0];if(p&&fileData.get(p)?.text){el.removeAttribute("src");el.textContent=fileData.get(p).text}}
-const marker=doc.createElement("script");marker.textContent=`window.GITHUB_SITE_LOADER=true;window.GITHUB_REPOSITORY=${JSON.stringify(OWNER+"/"+REPO)};window.GITHUB_FILE_COUNT=${fileData.size};`;doc.body?doc.body.appendChild(marker):doc.documentElement.appendChild(marker);return "<!doctype html>"+doc.documentElement.outerHTML}
-async function build(){try{startTime=performance.now();$("status").textContent="Reading repository file list…";const tree=await getTree();$("fileCount").textContent=tree.length;tree.forEach(x=>{totalBytes+=x.size||0;addRow(x.path,x.size||0)});$("totalSize").textContent=fmtBytes(totalBytes);setOverall();$("status").textContent=`Downloading ${tree.length} files…`;
-for(let i=0;i<tree.length;i++){await downloadFile(tree[i],i,tree.length);$("status").textContent=`Downloaded ${done}/${tree.length} files…`}
-const index=findIndex(tree);if(!index)throw Error("No index.html was found in the repository.");$("status").textContent="All files downloaded. Building site…";const source=fileData.get(index)?.text;if(source==null)throw Error("index.html could not be decoded as text.");const output=rewriteHtml(source,index);$("status").textContent="Site ready.";$("foot").textContent=`Built from ${fileData.size} GitHub files. Showing ${index}.`;setTimeout(()=>{$("site").srcdoc=output;document.body.classList.add("showSite")},150)}catch(e){$("status").textContent="Build failed";$("foot").textContent=e.message;console.error(e)}}
-build();
+const rows=new Map();
+const downloadedFiles=new Map();
+const objectUrls=new Map();
+let tree=[];
+let totalBytes=0;
+let downloadedBytes=0;
+let completed=0;
+let startedAt=0;
+let failed=false;
+
+function bytes(n){
+ if(!Number.isFinite(n))return "—";
+ const u=["B","KB","MB","GB"];let i=0;
+ while(n>=1024&&i<3){n/=1024;i++}
+ return (i&&n<10?n.toFixed(1):Math.round(n))+" "+u[i];
+}
+function time(s){
+ if(!Number.isFinite(s)||s<0)return "—";
+ s=Math.ceil(s);
+ if(s<60)return s+"s";
+ const m=Math.floor(s/60),r=s%60;
+ if(m<60)return m+"m "+r+"s";
+ return Math.floor(m/60)+"h "+(m%60)+"m";
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
+function mime(path){
+ const e=path.split(".").pop().toLowerCase();
+ return ({html:"text/html",htm:"text/html",css:"text/css",js:"text/javascript",mjs:"text/javascript",json:"application/json",txt:"text/plain",xml:"application/xml",svg:"image/svg+xml",png:"image/png",jpg:"image/jpeg",jpeg:"image/jpeg",gif:"image/gif",webp:"image/webp",avif:"image/avif",ico:"image/x-icon",mp3:"audio/mpeg",wav:"audio/wav",ogg:"audio/ogg",mp4:"video/mp4",webm:"video/webm",wasm:"application/wasm",glb:"model/gltf-binary",gltf:"model/gltf+json"})[e]||"application/octet-stream";
+}
+function addRow(item){
+ const el=document.createElement("div");
+ el.className="file";
+ el.innerHTML=`<div class="line"><div class="name" title="${esc(item.path)}">${esc(item.path)}</div><div class="state">Waiting</div></div><div class="bar"><i></i></div><div class="meta"><span class="pct">0%</span><span class="size">${bytes(item.size||0)}</span><span class="eta">ETA —</span></div>`;
+ $("files").appendChild(el);
+ rows.set(item.path,{el,state:el.querySelector(".state"),bar:el.querySelector(".bar i"),pct:el.querySelector(".pct"),eta:el.querySelector(".eta")});
+}
+function row(path,pct,state,eta){
+ const r=rows.get(path);if(!r)return;
+ r.el.classList.toggle("active",state==="Downloading");
+ r.el.classList.toggle("done",state==="Done");
+ r.el.classList.toggle("error",state==="Error");
+ r.state.textContent=state;
+ r.bar.style.width=Math.max(0,Math.min(100,pct))+"%";
+ r.pct.textContent=Math.round(pct)+"%";
+ r.eta.textContent="ETA "+(eta||"—");
+}
+function overall(){
+ const elapsed=(performance.now()-startedAt)/1000;
+ const rate=elapsed>0?downloadedBytes/elapsed:0;
+ const remaining=Math.max(0,totalBytes-downloadedBytes);
+ $("overallBar").style.width=(totalBytes?Math.min(100,downloadedBytes/totalBytes*100):0)+"%";
+ $("downloaded").textContent=bytes(downloadedBytes);
+ $("done").textContent=completed;
+ $("speed").textContent=rate?bytes(rate)+"/s":"—";
+ $("eta").textContent=rate?time(remaining/rate):"—";
+}
+async function getTree(){
+ const r=await fetch(API,{cache:"no-store",headers:{Accept:"application/vnd.github+json"}});
+ if(!r.ok)throw new Error("GitHub file list failed: HTTP "+r.status+" "+r.statusText);
+ const j=await r.json();
+ if(j.truncated)throw new Error("GitHub returned a truncated repository tree.");
+ return (j.tree||[]).filter(x=>x.type==="blob");
+}
+async function download(item){
+ const path=item.path;
+ row(path,0,"Downloading",null);
+ const started=performance.now();
+ let response;
+ try{
+   const url=RAW+path.split("/").map(encodeURIComponent).join("/")+`?loader=${Date.now()}`;
+   response=await fetch(url,{cache:"no-store",headers:{Accept:"*/*"}});
+   if(!response.ok)throw new Error("HTTP "+response.status+" "+response.statusText);
+   const reader=response.body?.getReader();
+   const chunks=[];
+   let got=0;
+   const expected=item.size||Number(response.headers.get("content-length"))||0;
+   if(reader){
+     while(true){
+       const part=await reader.read();
+       if(part.done)break;
+       chunks.push(part.value);
+       got+=part.value.byteLength;
+       downloadedBytes+=part.value.byteLength;
+       const elapsed=(performance.now()-started)/1000;
+       const rate=elapsed>0?got/elapsed:0;
+       row(path,expected?got/expected*100:0,"Downloading",rate&&expected?time((expected-got)/rate):null);
+       overall();
+     }
+   }else{
+     const b=new Uint8Array(await response.arrayBuffer());
+     chunks.push(b);got=b.byteLength;downloadedBytes+=got;overall();
+   }
+   const data=new Uint8Array(got);
+   let offset=0;
+   for(const c of chunks){data.set(c,offset);offset+=c.byteLength;}
+   downloadedFiles.set(path,{bytes:data,type:mime(path)});
+   completed++;
+   row(path,100,"Done",null);
+   overall();
+ }catch(e){
+   row(path,0,"Error",null);
+   throw new Error(path+": "+e.message);
+ }
+}
+async function worker(queue){
+ while(true){
+   const item=queue.shift();
+   if(!item)return;
+   await download(item);
+   $("status").textContent=`Downloading repository… ${completed}/${tree.length} files complete`;
+ }
+}
+function makeUrl(path){
+ const f=downloadedFiles.get(path);if(!f)return null;
+ if(objectUrls.has(path))return objectUrls.get(path);
+ const u=URL.createObjectURL(new Blob([f.bytes],{type:f.type}));
+ objectUrls.set(path,u);return u;
+}
+function isText(type){return type.startsWith("text/")||/javascript|json|xml|svg/.test(type);}
+function text(path){
+ const f=downloadedFiles.get(path);if(!f||!isText(f.type))return null;
+ return new TextDecoder().decode(f.bytes);
+}
+function cleanPath(path){return path.replace(/^\.\//,"").replace(/^\//,"");}
+function resolvePath(base,value){
+ if(!value)return null;
+ value=value.trim();
+ if(/^(https?:|data:|blob:|javascript:|mailto:|tel:|#|\/\/)/i.test(value))return null;
+ const parts=(value.startsWith("/")?value.slice(1):base.split("/").slice(0,-1).concat(value.split("/")).join("/")).split("/");
+ const out=[];
+ for(const p of parts){if(!p||p===".")continue;if(p==="..")out.pop();else out.push(p)}
+ return cleanPath(out.join("/"));
+}
+function rewriteCss(css,current){
+ return css.replace(/url\(\s*(["']?)([^"')]+)\1\s*\)/gi,(m,q,u)=>{
+   const p=resolvePath(current,u);const local=p&&downloadedFiles.has(p)?makeUrl(p):null;
+   return local?`url("${local}")`:m;
+ });
+}
+function rewriteJs(js,current){
+ return js.replace(/\bfetch\(\s*(["'])([^"']+)\1/g,(m,q,u)=>{
+   const p=resolvePath(current,u);const local=p&&downloadedFiles.has(p)?makeUrl(p):null;
+   return local?`fetch(${q}${local}${q}`:m;
+ }).replace(/\bimport\(\s*(["'])([^"']+)\1/g,(m,q,u)=>{
+   const p=resolvePath(current,u);const local=p&&downloadedFiles.has(p)?makeUrl(p):null;
+   return local?`import(${q}${local}${q}`:m;
+ }).replace(/\bfrom\s*(["'])([^"']+)\1/g,(m,q,u)=>{
+   const p=resolvePath(current,u);const local=p&&downloadedFiles.has(p)?makeUrl(p):null;
+   return local?`from ${q}${local}${q}`:m;
+ });
+}
+function buildHtml(source,current){
+ const doc=new DOMParser().parseFromString(source,"text/html");
+ doc.querySelectorAll("base").forEach(x=>x.remove());
+ for(const el of doc.querySelectorAll("link[href],img[src],source[src],video[src],audio[src],iframe[src],object[data],input[src],script[src],image[href]")){
+   for(const attr of ["href","src","data"]){
+     if(!el.hasAttribute(attr))continue;
+     const value=el.getAttribute(attr);const p=resolvePath(current,value);const local=p&&downloadedFiles.has(p)?makeUrl(p):null;
+     if(local)el.setAttribute(attr,local);
+   }
+ }
+ for(const el of doc.querySelectorAll("style"))el.textContent=rewriteCss(el.textContent,current);
+ for(const el of doc.querySelectorAll("[style]"))el.setAttribute("style",rewriteCss(el.getAttribute("style"),current));
+ for(const el of [...doc.querySelectorAll("link[rel~='stylesheet']")]){
+   const p=resolvePath(current,el.getAttribute("href"));
+   const css=p&&text(p);
+   if(css!=null){const style=doc.createElement("style");style.textContent=rewriteCss(css,p);el.replaceWith(style);}
+ }
+ for(const el of [...doc.querySelectorAll("script[src]")]){
+   const p=resolvePath(current,el.getAttribute("src"));
+   const js=p&&text(p);
+   if(js!=null){el.removeAttribute("src");el.textContent=rewriteJs(js,p);}
+ }
+ for(const el of doc.querySelectorAll("script:not([src])"))el.textContent=rewriteJs(el.textContent,current);
+ const bridge=doc.createElement("script");
+ const map={};
+ for(const [path] of downloadedFiles)map[path]=makeUrl(path);
+ bridge.textContent=`window.__FRUIT_FLY_LOCAL_FILES=${JSON.stringify(map)};window.__FRUIT_FLY_LOCAL_LOADED=true;`;
+ (doc.body||doc.documentElement).appendChild(bridge);
+ return "<!doctype html>"+doc.documentElement.outerHTML;
+}
+function showError(e){
+ failed=true;
+ $("errorText").textContent=String(e?.stack||e);
+ $("error").style.display="block";
+ $("loader").style.display="none";
+}
+async function start(){
+ if(failed)return;
+ try{
+   startedAt=performance.now();
+   $("status").textContent="Reading GitHub repository…";
+   tree=await getTree();
+   if(!tree.length)throw new Error("GitHub returned no files.");
+   totalBytes=tree.reduce((n,x)=>n+(x.size||0),0);
+   $("count").textContent=tree.length;
+   $("total").textContent=bytes(totalBytes);
+   tree.forEach(addRow);
+   overall();
+   $("status").textContent=`Downloading ${tree.length} files…`;
+   const queue=[...tree];
+   const workers=Array.from({length:Math.min(CONCURRENCY,queue.length)},()=>worker(queue));
+   await Promise.all(workers);
+   if(completed!==tree.length||downloadedFiles.size!==tree.length)throw new Error(`Only ${completed}/${tree.length} files downloaded.`);
+   $("status").textContent="All files downloaded. Starting local site…";
+   $("footer").textContent=`Downloaded ${downloadedFiles.size} files. No second repository download will be made.`;
+
+   let entry=tree.find(x=>x.path.toLowerCase()==="brain.html")?.path;
+   if(!entry)entry=tree.find(x=>x.path.toLowerCase()==="site.html")?.path;
+   if(!entry)entry=tree.find(x=>x.path.toLowerCase()==="viewer.html")?.path;
+   if(!entry)entry=tree.find(x=>x.path.toLowerCase()==="index.html")?.path;
+   if(!entry)throw new Error("No HTML entry file found.");
+
+   const source=text(entry);
+   if(source==null)throw new Error(entry+" is not a text HTML file.");
+
+   const loaderMarker=source.includes("Fruit Fly Brain — Loader")||source.includes("__FRUIT_FLY_LOCAL_LOADED")||source.includes("Preparing Fruit Fly Brain");
+   if(loaderMarker){
+     const candidates=tree.filter(x=>/\.html?$/i.test(x.path)&&x.path!==entry);
+     if(candidates.length){
+       entry=candidates[0].path;
+       $("status").textContent=`Loader detected. Launching ${entry} from downloaded files…`;
+     }else{
+       throw new Error("The repository currently contains only the loader as index.html. Add the actual fruit-fly viewer as brain.html or site.html so the loader has a separate site to launch.");
+     }
+   }
+
+   const finalSource=text(entry);
+   const output=buildHtml(finalSource,entry);
+   $("site").srcdoc=output;
+   document.body.classList.add("ready");
+ }catch(e){showError(e);console.error(e)}
+}
+start();
+})();
 </script>
 </body>
 </html>
